@@ -5,6 +5,8 @@ import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { Suspense } from "react";
 import CreateHousehold from "./components/CreateHousehold";
 import { HouseholdListSkeleton } from "@/app/ui/Skeletons";
+import { cn } from "@/lib/utils";
+import { inter, lusitana } from "@/app/ui/fonts";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -14,9 +16,13 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="flex-1 p-6 container mx-auto">
+    <div className="flex-1 p-6 container">
       <div className="flex flex-row justify-start items-center mb-3">
-        <h1 className="text-2xl font-bold text-neutral-500">Households </h1>
+        <h1
+          className={`text-2xl font-bold text-neutral-500 ${lusitana.className}`}
+        >
+          Households{" "}
+        </h1>
         <div className="text-md m-4 rounded-full text-neutral-500">
           {/* {households.length} */} 44
         </div>

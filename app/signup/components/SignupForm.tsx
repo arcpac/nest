@@ -84,7 +84,6 @@ export default function SignupForm() {
 
         <Button
           onClick={() => {
-            console.log("submitting", { name, email, password });
             handleRegisterUser({ name, email, password });
           }}
         >

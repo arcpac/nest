@@ -1,4 +1,5 @@
 import { getHouseholdId } from "@/app/(main-app)/dashboard/lib/houseHold";
+import { lusitana } from "@/app/ui/fonts";
 import Link from "next/link";
 import React from "react";
 
@@ -9,7 +10,7 @@ const HouseHoldWrapper = async ({ houseHoldId }: { houseHoldId: string }) => {
     <div>
       {/* Household Header */}
       <div className="flex flex-row justify-start items-center mb-3">
-        <h1 className="text-2xl font-bold text-neutral-500">
+        <h1 className={`text-2xl font-bold text-neutral-500 ${lusitana.className}`}>
           {household.name}{" "}
         </h1>
         <div className="text-md m-4 rounded-full text-neutral-500">

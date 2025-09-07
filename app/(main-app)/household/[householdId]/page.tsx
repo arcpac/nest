@@ -1,4 +1,3 @@
-
 import HouseHoldWrapper from "./components/HouseHoldWrapper";
 import { Suspense } from "react";
 
@@ -14,7 +13,7 @@ export default async function HouseholdDetailPage({ params }: Params) {
   }
 
   return (
-    <div className="flex-1 p-6 container mx-auto">
+    <div className="flex-1 p-6 container">
       <Suspense fallback={<div>Loading...</div>}>
         <HouseHoldWrapper houseHoldId={houseHoldId} />
       </Suspense>

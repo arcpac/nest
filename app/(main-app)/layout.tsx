@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import MainNavBar from "./components/MainNavBar";
 import { inter, lusitana } from "../ui/fonts";
+import SideNav from "./components/Sidenav";
 
 export default async function MainAppLayout({
   children,
@@ -14,10 +15,13 @@ export default async function MainAppLayout({
 
   return (
     <div
-      className={`main-app-layout flex flex-col min-h-screen bg-[#f7f9ff] ${inter.className}`}
+      className={`main-app-layout flex h-screen flex-col md:flex-row md:overflow-hidden ${inter.className}`}
     >
-      <MainNavBar />
-      <main className="flex-1 p-6">{children}</main>
+      <div className="w-full flex-none md:w-64">
+        <SideNav />
+      </div>
+      {/* <MainNavBar /> */}
+      <main className="flex-1">{children}</main>
     </div>
   );
 }
