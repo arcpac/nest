@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { households } from "@/db/schema";
+import { households, members } from "@/db/schema";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
@@ -35,4 +35,19 @@ export const createHousehold = protectedAction
     revalidatePath("/dashboard");
 
     return { success: true } as const;
+  });
+
+export const getMembers = protectedAction
+  .inputSchema(
+    z.object({
+      id: z.string(),
+    })
+  )
+  .action(async ({ parsedInput }) => {
+    const result = await db
+      .select()
+      .from(members)
+      .where(eq(members.household_id, parsedInput.id));
+
+    return { success: true, data: result } as const;
   });
