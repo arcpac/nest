@@ -41,7 +41,7 @@ export default function SignupForm() {
       }
     },
     onError({ error }) {
-      console.log("onError rendered");
+
       setFieldErrors(error.validationErrors);
     },
   });
