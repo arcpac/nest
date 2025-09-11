@@ -1,13 +1,12 @@
-
-import { PencilIcon, Trash } from 'lucide-react';
-import Image from 'next/image';
-import { getAllHouseholds } from '../../lib/houseHold';
-
+import { Pencil, Trash } from "lucide-react";
+import Image from "next/image";
+import { getAllHouseholds } from "../../lib/houseHold";
+import Link from "next/link";
 
 export default async function HouseHoldTable() {
-//   const invoices = await fetchFilteredInvoices(query, currentPage);
+  //   const invoices = await fetchFilteredInvoices(query, currentPage);
 
-const households = await getAllHouseholds();
+  const households = await getAllHouseholds();
 
   return (
     <div className="mt-6 flow-root">
@@ -15,10 +14,7 @@ const households = await getAllHouseholds();
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
             {households?.map((hh) => (
-              <div
-                key={hh.id}
-                className="mb-2 w-full rounded-md bg-white p-4"
-              >
+              <div key={hh.id} className="mb-2 w-full rounded-md bg-white p-4">
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <div className="mb-2 flex items-center">
@@ -43,7 +39,12 @@ const households = await getAllHouseholds();
                     <p>123</p>
                   </div>
                   <div className="flex justify-end gap-2">
-                    <PencilIcon />
+                    {/* <Link
+                      href={`/dashboard/households/${hh.id}/edit`}
+                      className="rounded-md border p-2 hover:bg-gray-100"
+                    >
+                      <PencilIcon className="w-5" /> test
+                    </Link> */}
                     <Trash />
                     {/* <UpdateInvoice id={invoice.id} />
                     <DeleteInvoice id={invoice.id} /> */}
@@ -108,8 +109,13 @@ const households = await getAllHouseholds();
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                    <PencilIcon />
-                    <Trash />
+                      <Link
+                        href={`/dashboard/households/${hh.id}/edit`}
+                        className="inline-flex items-center p-2 rounded hover:bg-gray-100"
+                      >
+                        <Pencil className="w-5 h-5 text-gray-600" />
+                      </Link>
+                      <Trash />
                       {/* <UpdateInvoice id={invoice.id} />
                       <DeleteInvoice id={invoice.id} /> */}
                     </div>

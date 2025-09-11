@@ -44,11 +44,13 @@ async function seed() {
       {
         id: "10000000-0000-0000-0000-000000000001",
         name: "My Apartment",
+        active: true,
         created_by: "00000000-0000-0000-0000-000000000001",
       },
       {
         id: "10000000-0000-0000-0000-000000000002",
         name: "Parents Home",
+        active: true,
         created_by: "00000000-0000-0000-0000-000000000001",
       },
     ])
