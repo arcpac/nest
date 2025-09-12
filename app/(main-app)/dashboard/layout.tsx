@@ -1,3 +1,5 @@
+import DataProvider from "@/app/DataProvider";
+
 export default async function DashboardLayout({
   children,
 }: {

@@ -2,6 +2,8 @@
 // import { CalendarIcon } from "@heroicons/react/24/outline";
 
 // import { fetchRevenue } from "@/app/lib/data";
+'use client'
+import { useDataStore } from "@/app/DataProvider";
 import { lusitana } from "@/app/ui/fonts";
 import { CalendarIcon } from "lucide-react";
 
@@ -11,7 +13,8 @@ import { CalendarIcon } from "lucide-react";
 // https://www.chartjs.org/
 // https://airbnb.io/visx/
 
-export default async function ExpensesChart() {
+export default function ExpensesChart() {
+  const add = useDataStore((state) => state.add);
   const chartHeight = 350;
 
   // //   const revenue = await fetchRevenue(); // Fetch data inside the component
@@ -59,7 +62,10 @@ export default async function ExpensesChart() {
           ))} */}
         </div>
         <div className="flex items-center pb-2 pt-6">
-          <CalendarIcon className="h-5 w-5 text-gray-500" />
+          <CalendarIcon
+            onClick={() => add()}
+            className="h-5 w-5 text-gray-500"
+          />
           <h3 className="ml-2 text-sm text-gray-500 ">Last 12 months</h3>
         </div>
       </div>

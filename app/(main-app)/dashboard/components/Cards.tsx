@@ -1,5 +1,6 @@
 import { lusitana } from "@/app/ui/fonts";
 import { Banknote, Clock, Group, Inbox } from "lucide-react";
+import CardTest from "./CardTest";
 
 // import { fetchCardData } from "@/app/lib/data";
 
@@ -19,7 +20,8 @@ export default async function CardWrapper() {
   // } = await fetchCardData();
   return (
     <>
-      <Card title="Collected" value={123.88} type="collected" />
+      <CardTest title="Collected" type="collected" />
+      {/* <Card title="Collected" value={1} type="collected" /> */}
       <Card title="Pending" value={123.23} type="pending" />
       <Card title="Total Invoices" value={453.0} type="invoices" />
       <Card title="Total Debtors" value={2} type="debtors" />
