@@ -8,6 +8,13 @@ import { HouseholdListSkeleton } from "@/app/ui/Skeletons";
 import { cn } from "@/lib/utils";
 import { inter, lusitana } from "@/app/ui/fonts";
 import Link from "next/link";
+import CardWrapper from "./components/Cards";
+import ExpensesChart from "./components/ExpensesChart";
+import {
+  CardSkeleton,
+  InvoiceSkeleton,
+  RevenueChartSkeleton,
+} from "@/components/ui/skeleton";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -17,26 +24,29 @@ export default async function DashboardPage() {
   }
 
   return (
-    // <div className="flex-1 p-6 container">
-    <>
-      <div className="flex flex-row justify-start items-center mb-3">
-        <h1
-          className={`text-2xl font-bold text-neutral-500 ${lusitana.className}`}
-        >
-          Households{" "}
-        </h1>
-        <div className="text-sm text-blue-500 m-4 rounded-full ">
-          {/* {households.length} */}
-          <Link href="/household">Manage households</Link>
-        </div>
+    <main>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        Dashboard
+      </h1>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Suspense fallback={<CardSkeleton />}>
+          <CardWrapper />
+        </Suspense>
       </div>
-      <div className="rounded-xl border p-4 transition bg-white my-2">
-        <CreateHousehold />
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+        <Suspense fallback={<RevenueChartSkeleton />}>
+          <ExpensesChart />
+        </Suspense>
+        <Suspense fallback={<InvoiceSkeleton />}>
+          <HouseHoldList />
+        </Suspense>
+        {/* <Suspense fallback={<RevenueChartSkeleton />}>
+          <ExpensesChart />
+        </Suspense> */}
+        {/* <Suspense fallback={<LatestInvoicesSkeleton />}>
+          <HouseholdList />
+        </Suspense> */}
       </div>
-      <Suspense fallback={<HouseholdListSkeleton />}>
-        <HouseHoldList />
-      </Suspense>
-    </>
-    // </div>
+    </main>
   );
 }

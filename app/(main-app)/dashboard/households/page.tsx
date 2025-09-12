@@ -4,7 +4,7 @@ import { lusitana } from "@/app/ui/fonts";
 import Link from "next/link";
 import { HouseholdSkeleton } from "./components/HouseholdSkeleton";
 
-const page = () => {
+const HouseholdPage = () => {
   return (
     <div className="w-full">
       <div className="flex flex-row justify-start items-center mb-3">
@@ -23,8 +23,9 @@ const page = () => {
       <CreateInvoice />
     </div> */}
       <Suspense fallback={<HouseholdSkeleton />}>
-      <HouseHoldTable />
+        <HouseHoldTable />
       </Suspense>
+      
       {/* <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div> */}
@@ -32,4 +33,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default HouseholdPage;

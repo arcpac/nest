@@ -1,30 +1,26 @@
 import React from "react";
 import Link from "next/link";
 import { Household } from "../types";
-
+import { lusitana } from "@/app/ui/fonts";
+import clsx from "clsx";
 
 const HouseHoldItem = ({ household }: { household: Household }) => {
   return (
-    <li
-      key={household.id}
-      className="rounded-xl border p-4 transition bg-white"
-    >
-      <Link href={`/household/${household.id}`}>
-        <div className="flex flex-col space-y-2 ">
-          {/* Currency */}
-          <div className="text-lg font-semibold text-neutral-500">
+    <>
+      <div className="flex items-center">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold md:text-base">
             {household.name}
-          </div>
-
-          <div className="mt-2 inline-flex items-center space-x-2">
-            <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-            <span className="text-xs text-neutral-500 px-2 py-1 rounded-md border">
-              Active
-            </span>
-          </div>
+          </p>
+          <p className="hidden text-sm text-gray-500 sm:block">Members: 5 </p>
         </div>
-      </Link>
-    </li>
+      </div>
+      <p
+        className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
+      >
+        {household.active ? "Active" : "Inactive"}
+      </p>
+    </>
   );
 };
 
