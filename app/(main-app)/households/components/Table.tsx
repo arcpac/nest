@@ -1,12 +1,27 @@
+"use client";
+
 import { Pencil, Trash } from "lucide-react";
-import Image from "next/image";
-import { getAllHouseholds } from "../../lib/houseHold";
 import Link from "next/link";
-
-export default async function HouseHoldTable() {
-  //   const invoices = await fetchFilteredInvoices(query, currentPage);
-
-  const households = await getAllHouseholds();
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+type HouseholdsProp = {
+  id: string;
+  name: string;
+  active: boolean;
+  created_by: string;
+  created_at: Date;
+}[];
+function HouseHoldTable({ households }: { households: HouseholdsProp }) {
 
   return (
     <div className="mt-6 flow-root">
@@ -98,7 +113,21 @@ export default async function HouseHoldTable() {
                     {/* {formatDateToLocal(invoice.date)} */}123
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {/* <InvoiceStatus status={hh.status} /> */}status
+                    {hh.active ? (
+                      <Label
+                        htmlFor="r2"
+                        className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                      >
+                        Active
+                      </Label>
+                    ) : (
+                      <Label
+                        htmlFor="r1"
+                        className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
+                      >
+                        Inactive
+                      </Label>
+                    )}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
@@ -108,9 +137,28 @@ export default async function HouseHoldTable() {
                       >
                         <Pencil className="w-5 h-5 text-gray-600" />
                       </Link>
-                      <Trash />
-                      {/* <UpdateInvoice id={invoice.id} />
-                      <DeleteInvoice id={invoice.id} /> */}
+
+                      <AlertDialog>
+                        <AlertDialogTrigger>
+                          <Trash className="w-5 h-5 text-gray-600" />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete your account and remove your
+                              data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction>Continue</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </td>
                 </tr>
@@ -122,3 +170,5 @@ export default async function HouseHoldTable() {
     </div>
   );
 }
+
+export default HouseHoldTable;

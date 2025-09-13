@@ -1,7 +1,9 @@
+"use client";
 import { lusitana } from "@/app/ui/fonts";
 import { BadgeDollarSign, PowerIcon } from "lucide-react";
 import Link from "next/link";
 import NavLinks from "./NavLinks";
+import DataProvider from "@/app/DataProvider";
 
 export default function SideNav() {
   return (

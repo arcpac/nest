@@ -5,27 +5,27 @@ import { FileText, HomeIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Map of links to display in the side navigation.
-// Depending on the size of the application, this would be stored in a database.
 const links = [
   { name: "Home", href: "/dashboard", icon: HomeIcon },
   {
-    name: "Households",
-    href: "/dashboard/households",
+    name: "Groups",
+    href: "/households",
     icon: FileText,
   },
-  { name: "Members", href: "/dashboard/members", icon: UsersIcon },
+  { name: "Members", href: "/members", icon: UsersIcon },
 ];
 
 export default function NavLinks() {
   const pathname = usePathname();
+  const segmentName = pathname.split("/").pop();
 
   return (
     <>
       {links.map((link) => {
+        const activeLink = link.href.split("/").pop();
         const LinkIcon = link.icon;
-        const isActive =
-          pathname === link.href || pathname.startsWith(`${link.href}/`);
+        const isActive = segmentName === activeLink;
+
         return (
           <Link
             key={link.name}

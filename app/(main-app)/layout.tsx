@@ -20,8 +20,9 @@ export default async function MainAppLayout({
       <div className="w-full flex-none md:w-64">
         <SideNav />
       </div>
-      {/* <MainNavBar /> */}
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <div className="flex-1 p-6">{children}</div>
+      </main>
     </div>
   );
 }
