@@ -1,8 +1,18 @@
-import { pgTable, uuid, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  boolean,
+  numeric,
+  serial,
+  unique,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name").notNull(),
+  username: text("username").notNull(),
+  role: text("role").notNull().default("user"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
@@ -10,10 +20,9 @@ export const users = pgTable("users", {
     .notNull(),
 });
 
-export const households = pgTable("households", {
+export const groups = pgTable("groups", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
-  active: boolean("active").default(false).notNull(),
   created_by: uuid("created_by")
     .notNull()
     .references(() => users.id),
@@ -22,24 +31,80 @@ export const households = pgTable("households", {
     .notNull(),
 });
 
-export const members = pgTable("members", {
+export const members = pgTable(
+  "members",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    user_id: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    group_id: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    email: text("email"),
+    joined_at: timestamp("joined_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [unique().on(table.user_id, table.group_id)]
+);
+
+export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  household_id: uuid("household_id")
+  title: text("title").notNull(),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  description: text("description"),
+  created_by: uuid("created_by")
     .notNull()
-    .references(() => households.id, { onDelete: "cascade" }),
+    .references(() => users.id),
+  group_id: uuid("group_id")
+    .notNull()
+    .references(() => groups.id),
+  created_at: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const expense_shares = pgTable(
+  "expense_shares",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    expense_id: uuid("expense_id")
+      .notNull()
+      .references(() => expenses.id, { onDelete: "cascade" }),
+    member_id: uuid("member_id")
+      .notNull()
+      .references(() => members.id, { onDelete: "cascade" }),
+    share: numeric("share", { precision: 10, scale: 2 }).notNull(), // how much this member owes
+    paid: boolean("paid").default(false).notNull(), // whether the member has settled their share
+    created_at: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [unique().on(table.expense_id, table.member_id)]
+);
+
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  body: text("body").notNull(), // Content of the post
   user_id: uuid("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  email: text("email").notNull(),
-  first_name: text("first_name"),
-  last_name: text("last_name"),
-  role: text("role").default("member").notNull(), // e.g. "owner", "admin", "member"
-  joined_at: timestamp("joined_at", { withTimezone: true })
+    .references(() => users.id),
+  group_id: uuid("group_id")
+    .notNull()
+    .references(() => groups.id),
+  status: text("status").default("draft").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
 });
 
 export const schema = {
-  household: households,
-  user: users,
+  users,
+  groups,
+  members,
+  expenses,
+  expense_shares,
+  posts,
 };
