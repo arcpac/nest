@@ -1,5 +1,5 @@
 import React from "react";
-import { getUserGroups } from "../lib/groups";
+import { getUserGroups } from "../../actions/groups";
 import { lusitana } from "@/app/ui/fonts";
 import clsx from "clsx";
 import HouseHoldItem from "./HouseHoldItem";

@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 
-import { getUserGroups } from "../dashboard/lib/groups";
+import { getUserGroups } from "../actions/groups";
 import { redirect } from "next/navigation";
 import GroupsView from "./components/GroupsView";
 

@@ -2,7 +2,7 @@ import React from "react";
 import {
   getGroupExpenses,
   getGroupWithMembers,
-} from "@/app/(main-app)/dashboard/lib/groups";
+} from "@/app/(main-app)/actions/groups";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";

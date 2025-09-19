@@ -1,7 +1,5 @@
 import { lusitana } from "@/app/ui/fonts";
 import React from "react";
-import ExpenseItem from "./ExpenseItem";
-import clsx from "clsx";
 import Link from "next/link";
 type ExpensesProps = {
   id: string;
@@ -14,7 +12,13 @@ type ExpensesProps = {
   yourShare: string;
 }[];
 
-const ExpenseList = ({ expenses, groupId }: { expenses: ExpensesProps; groupId: string }) => {
+const ExpenseList = ({
+  expenses,
+  groupId,
+}: {
+  expenses: ExpensesProps;
+  groupId: string;
+}) => {
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="flex flex-row justify-between">
@@ -27,23 +31,60 @@ const ExpenseList = ({ expenses, groupId }: { expenses: ExpensesProps; groupId: 
           </Link>
         </div>
       </div>
-      <div className="flex justify-between flex-col rounded-xl bg-gray-50 p-4">
-        <div className="bg-white px-6">
-          {expenses.map((expense, i) => {
-            return (
-              <div
-                key={i}
-                className={clsx(
-                  "flex flex-row items-center justify-between py-4",
-                  {
-                    "border-t": i !== 0,
-                  }
-                )}
-              >
-                <ExpenseItem expense={expense} />
-              </div>
-            );
-          })}
+      <div className="rounded-xl bg-gray-50 p-4">
+        <div className="bg-white rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="border-b">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Expense
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total Amount
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Your Share
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {expenses.map((expense, i) => (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {new Date(expense.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-700">
+                          {(expense.title || "?").charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {expense.title}
+                        </p>
+                        {expense.description && (
+                          <p className="text-xs text-gray-500 truncate">
+                            {expense.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                    ${expense.amount}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                    ${expense.yourShare}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

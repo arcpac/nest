@@ -1,5 +1,5 @@
 import React from "react";
-import { getGroupWithMembers } from "@/app/(main-app)/dashboard/lib/groups";
+import { getGroupWithMembers } from "@/app/(main-app)/actions/groups";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
