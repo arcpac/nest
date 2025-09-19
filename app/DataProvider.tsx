@@ -5,6 +5,8 @@ import { createContext } from "react";
 
 type DataStore = {
   count: number;
+  totalDebt: string;
+  totalActiveExpenses: number;
   add: () => void;
 };
 
@@ -12,15 +14,21 @@ const DataContext = createContext<StoreApi<DataStore> | undefined>(undefined);
 
 type DataProviderProps = PropsWithChildren & {
   initialCount: number;
+  initialExpenseData: {
+    totalDebt: string;
+    totalActiveExpenses: number;
+  };
 };
 
 export default function DataProvider({
   children,
   initialCount,
+  initialExpenseData,
 }: DataProviderProps) {
   const [store] = useState(() =>
     createStore<DataStore>((set) => ({
       count: initialCount,
+      ...initialExpenseData,
       add: () => set((state) => ({ count: state.count + 1 })),
     }))
   );
@@ -31,7 +39,7 @@ export default function DataProvider({
 export function useDataStore<T>(selector: (state: DataStore) => T) {
   const store = useContext(DataContext);
   if (!store) {
-    throw new Error("Missing BearStoreProvider");
+    throw new Error("Missing Missin");
   }
   return useStore(store, selector);
 }

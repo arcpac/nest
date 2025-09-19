@@ -101,17 +101,17 @@ async function seed() {
     .values([
       {
         id: randomUUID(),
-        title: "Grocery Shopping",
-        amount: "120.50",
-        description: "Weekly groceries for the apartment",
+        title: "Rice",
+        amount: "34.99",
+        description: "For 3 months",
         created_by: user.id, // use the actual user ID
         group_id: group.id, // use the actual group ID
       },
       {
         id: randomUUID(),
-        title: "Electricity Bill",
-        amount: "85.30",
-        description: "Monthly electricity bill",
+        title: "Coffee beans",
+        amount: "26.99",
+        description: "Coffee stock",
         created_by: user.id, // use the actual user ID
         group_id: group.id, // use the actual group ID
       },

@@ -44,7 +44,7 @@ export const members = pgTable(
       .references(() => groups.id, { onDelete: "cascade" }),
     first_name: text("first_name"),
     last_name: text("last_name"),
-    email: text("email"),
+    email: text("email").notNull(),
     joined_at: timestamp("joined_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -63,6 +63,7 @@ export const expenses = pgTable("expenses", {
   group_id: uuid("group_id")
     .notNull()
     .references(() => groups.id),
+  isEqual: boolean("isEqual").default(true).notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

@@ -1,3 +1,5 @@
+"use client";
+import { useDataStore } from "@/app/DataProvider";
 import { lusitana } from "@/app/ui/fonts";
 import { Banknote, Clock, Group, Inbox } from "lucide-react";
 
@@ -10,18 +12,20 @@ const iconMap = {
   invoices: Inbox,
 };
 
-export default async function CardWrapper() {
-  // const {
-  //   numberOfInvoices,
-  //   numberOfCustomers,
-  //   totalPaidInvoices,
-  //   totalPendingInvoices,
-  // } = await fetchCardData();
+export default function CardWrapper() {
+  const totalDebt = useDataStore((state) => state.totalDebt);
+  const totalActiveExpenses = useDataStore(
+    (state) => state.totalActiveExpenses
+  );
   return (
     <>
       <Card title="Collected" value={1} type="collected" />
-      <Card title="Pending" value={123.23} type="pending" />
-      <Card title="Total Invoices" value={453.0} type="invoices" />
+      <Card title="Pending" value={totalDebt} type="pending" />
+      <Card
+        title="Total Active Expenses"
+        value={totalActiveExpenses}
+        type="invoices"
+      />
       <Card title="Total Debtors" value={2} type="debtors" />
     </>
   );
