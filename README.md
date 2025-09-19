@@ -1,17 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Nest App
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -36,9 +30,16 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 
+## Database details
+- [**Postgres**](https://orm.drizzle.team/docs/get-started/postgresql-new) – Relational database engine (RDBMS)
+- [**Drizzle**](https://orm.drizzle.team/docs/get-started/postgresql-new) – Type-safe ORM / query builder for TypeScript
+- [**dbDiagram**](https://dbdiagram.io/home) – Database schema visualization tool
 
-UI Inspiration
+### Setup database environment
 
-https://www.behance.net/gallery/221718407/SOFTSHAPER-project?tracking_source=search_projects|software+interface&l=40
+## Nest App
+First, run the development server:
 
-# nest
+```bash
+asdfsfd
+```
