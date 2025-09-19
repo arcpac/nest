@@ -14,26 +14,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-type HouseholdsProp = {
+type GroupsProp = {
   id: string;
   name: string;
-  active: boolean;
+  active: boolean | null;
   created_by: string;
   created_at: Date;
 }[];
-function HouseHoldTable({ households }: { households: HouseholdsProp }) {
-
+function GroupsTable({ groups }: { groups: GroupsProp }) {
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            {households?.map((hh) => (
-              <div key={hh.id} className="mb-2 w-full rounded-md bg-white p-4">
+            {groups?.map((group) => (
+              <div
+                key={group.id}
+                className="mb-2 w-full rounded-md bg-white p-4"
+              >
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <div className="mb-2 flex items-center">
-                      <p>{hh.name}</p>
+                      <p>{group.name}</p>
                     </div>
                     {/* <p className="text-sm text-gray-500">{invoice.email}</p> */}
                   </div>
@@ -48,7 +50,7 @@ function HouseHoldTable({ households }: { households: HouseholdsProp }) {
                   </div>
                   <div className="flex justify-end gap-2">
                     {/* <Link
-                      href={`/dashboard/households/${hh.id}/edit`}
+                      href={`/dashboard/households/${group.id}/edit`}
                       className="rounded-md border p-2 hover:bg-gray-100"
                     >
                       <PencilIcon className="w-5" /> test
@@ -85,9 +87,9 @@ function HouseHoldTable({ households }: { households: HouseholdsProp }) {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {households?.map((hh) => (
+              {groups?.map((group) => (
                 <tr
-                  key={hh.id}
+                  key={group.id}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                 >
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
@@ -99,7 +101,11 @@ function HouseHoldTable({ households }: { households: HouseholdsProp }) {
                         height={28}
                         alt={`${invoice.name}'s profile picture`}
                       /> */}
-                      <p>{hh.name}</p>
+                      <Link href={`/groups/${group.id}/view`}>
+                        <span className="hover: text-blue-500 hover:underline">
+                          {group.name}
+                        </span>
+                      </Link>
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
@@ -113,7 +119,7 @@ function HouseHoldTable({ households }: { households: HouseholdsProp }) {
                     {/* {formatDateToLocal(invoice.date)} */}123
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {hh.active ? (
+                    {group.active ? (
                       <Label
                         htmlFor="r2"
                         className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
@@ -132,7 +138,7 @@ function HouseHoldTable({ households }: { households: HouseholdsProp }) {
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
                       <Link
-                        href={`/dashboard/households/${hh.id}/edit`}
+                        href={`/groups/${group.id}/edit`}
                         className="inline-flex items-center p-2 rounded hover:bg-gray-100"
                       >
                         <Pencil className="w-5 h-5 text-gray-600" />
@@ -171,4 +177,4 @@ function HouseHoldTable({ households }: { households: HouseholdsProp }) {
   );
 }
 
-export default HouseHoldTable;
+export default GroupsTable;

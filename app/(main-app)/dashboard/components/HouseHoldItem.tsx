@@ -1,8 +1,6 @@
 import React from "react";
-import Link from "next/link";
 import { Household } from "../types";
 import { lusitana } from "@/app/ui/fonts";
-import clsx from "clsx";
 
 const HouseHoldItem = ({ household }: { household: Household }) => {
   return (

@@ -1,22 +1,26 @@
-import React from "react";
-import { getUserGroups } from "../lib/groups";
 import { lusitana } from "@/app/ui/fonts";
+import React from "react";
+import ExpenseItem from "./ExpenseItem";
 import clsx from "clsx";
-import HouseHoldItem from "./HouseHoldItem";
-
-const HouseHoldList = async () => {
-  const households = await getUserGroups();
-  if (!households || households.length === 0) {
-    return <div>No households found</div>;
-  }
+type ExpensesProps = {
+  id: string;
+  title: string;
+  amount: string;
+  description: string | null;
+  created_by: string;
+  groupId: string;
+  createdAt: Date;
+  expenseShare?: string;
+}[];
+const ExpenseList = ({ expenses }: { expenses: ExpensesProps }) => {
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Your Groups
+        Expenses
       </h2>
       <div className="flex justify-between flex-col rounded-xl bg-gray-50 p-4">
         <div className="bg-white px-6">
-          {households.map((hh, i) => {
+          {expenses.map((expense, i) => {
             return (
               <div
                 key={i}
@@ -27,7 +31,7 @@ const HouseHoldList = async () => {
                   }
                 )}
               >
-                <HouseHoldItem household={hh} />
+                <ExpenseItem expense={expense} />
               </div>
             );
           })}
@@ -37,4 +41,4 @@ const HouseHoldList = async () => {
   );
 };
 
-export default HouseHoldList;
+export default ExpenseList;

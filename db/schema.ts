@@ -23,6 +23,7 @@ export const users = pgTable("users", {
 export const groups = pgTable("groups", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
+  active: boolean("active").default(true),
   created_by: uuid("created_by")
     .notNull()
     .references(() => users.id),
@@ -41,6 +42,8 @@ export const members = pgTable(
     group_id: uuid("group_id")
       .notNull()
       .references(() => groups.id, { onDelete: "cascade" }),
+    first_name: text("first_name"),
+    last_name: text("last_name"),
     email: text("email"),
     joined_at: timestamp("joined_at", { withTimezone: true })
       .defaultNow()

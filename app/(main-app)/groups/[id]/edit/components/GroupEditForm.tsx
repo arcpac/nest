@@ -1,5 +1,6 @@
 "use client";
 
+import { lusitana } from "@/app/ui/fonts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,28 +8,39 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import React, { useState } from "react";
 
-interface HouseholdProps {
+interface GroupProps {
   id: string;
   name: string;
-  active: boolean;
+  active: boolean | null;
+  created_by: string;
+  creator_username: string | null;
+  creator_email: string | null;
 }
 
-const HouseholdEditForm = ({ household }: { household: HouseholdProps }) => {
-  const [name, setName] = useState(household.name);
-  const [active, setActive] = useState(household.active);
+const GroupEditForm = ({ group }: { group: GroupProps }) => {
+  const [name, setName] = useState(group.name);
+  const [active, setActive] = useState(group.active);
   return (
     <div>
+      <div>
+        <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+          {group.name}
+        </h2>
+        <span className="text-sm italic">
+          Created by: {group.creator_username}
+        </span>
+      </div>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         <div className="mb-4">
           <label htmlFor="name" className="mb-2 block text-sm font-medium">
-            Household Name
+            Group Name
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <Input
                 id="name"
                 placeholder="e.g. My Apartment"
-                value={household.name}
+                value={group.name}
                 className="bg-white"
                 // defaultValue={household.name}
                 onChange={(e) => setName(e.target.value)}
@@ -43,7 +55,7 @@ const HouseholdEditForm = ({ household }: { household: HouseholdProps }) => {
           <RadioGroup
             defaultValue="comfortable"
             className="flex gap-4"
-            value={household.active ? "active" : "inactive"}
+            value={group.active ? "active" : "inactive"}
             onValueChange={(val) => setActive(val === "active" ? true : false)}
           >
             <div className="flex items-center">
@@ -88,4 +100,4 @@ const HouseholdEditForm = ({ household }: { household: HouseholdProps }) => {
   );
 };
 
-export default HouseholdEditForm;
+export default GroupEditForm;

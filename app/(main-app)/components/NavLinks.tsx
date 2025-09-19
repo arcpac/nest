@@ -9,7 +9,7 @@ const links = [
   { name: "Home", href: "/dashboard", icon: HomeIcon },
   {
     name: "Groups",
-    href: "/households",
+    href: "/groups",
     icon: FileText,
   },
   { name: "Members", href: "/members", icon: UsersIcon },

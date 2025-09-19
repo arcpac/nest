@@ -1,12 +1,22 @@
 import React, { Suspense } from "react";
-import HouseHoldTable from "./components/Table";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../api/auth/[...nextauth]/route";
+
+import HouseHoldTable from "./components/GroupsTable";
 import { lusitana } from "@/app/ui/fonts";
 import Link from "next/link";
 import { HouseholdSkeleton } from "./components/HouseholdSkeleton";
-import { getAllHouseholds } from "../dashboard/lib/houseHold";
+import { getUserGroups } from "../dashboard/lib/groups";
+import { redirect } from "next/navigation";
+import GroupsTable from "./components/GroupsTable";
 
-const HouseholdPage = async () => {
-  const households = await getAllHouseholds();
+const GroupsPage = async () => {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+  console.log("session", session);
+  const groups = await getUserGroups(session.user.id);
   return (
     <div className="w-full">
       <div className="flex flex-row justify-start items-center mb-3">
@@ -16,23 +26,14 @@ const HouseholdPage = async () => {
           Your groups{" "}
         </h1>
         <div className="text-sm text-blue-500 m-4 rounded-full ">
-          {/* {households.length} */}
           <Link href="/household">Manage households</Link>
         </div>
       </div>
-      {/* <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-      <Search placeholder="Search invoices..." />
-      <CreateInvoice />
-    </div> */}
       <Suspense fallback={<HouseholdSkeleton />}>
-        <HouseHoldTable households={households} />
+        <GroupsTable groups={groups} />
       </Suspense>
-
-      {/* <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
-      </div> */}
     </div>
   );
 };
 
-export default HouseholdPage;
+export default GroupsPage;

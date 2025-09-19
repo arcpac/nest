@@ -1,16 +1,14 @@
 import { lusitana } from "@/app/ui/fonts";
-import { members } from "@/db/schema";
 import clsx from "clsx";
-import { ArrowBigLeft } from "lucide-react";
 import React from "react";
 
 type MembersProps = {
   id: string;
+  user_id: string;
   first_name: string | null;
   last_name: string | null;
-  email: string;
-  household_id: string;
-  joined_at: string | null;
+  email: string | null;
+  joined_at: Date;
 }[];
 
 const MembersList = ({ members }: { members: MembersProps }) => {
@@ -45,7 +43,7 @@ const MembersList = ({ members }: { members: MembersProps }) => {
                 <p
                   className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
                 >
-                  {member.joined_at}
+                  {member.joined_at.toISOString()}
                 </p>
               </div>
             );
