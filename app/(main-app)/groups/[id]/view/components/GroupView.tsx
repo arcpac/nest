@@ -32,6 +32,7 @@ type ExpensesProps = {
   created_by: string;
   createdAt: Date;
   yourShare: string;
+  isPaid: boolean;
 }[];
 
 function GroupView({
@@ -60,7 +61,7 @@ function GroupView({
         </h1>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <Suspense fallback={<CardsSkeleton />}>
-            <CardWrapper/>
+            <CardWrapper />
           </Suspense>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-6 ">

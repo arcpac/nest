@@ -3,7 +3,6 @@ import { db } from "@/db";
 import { and, eq } from "drizzle-orm";
 
 export async function getUserGroups(userId: string) {
-
   // Fetch groups where the user is a member (not just the creator)
   const userGroups = await db
     .select({
@@ -159,6 +158,7 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         created_by: expenses.created_by,
         createdAt: expenses.created_at,
         share: expense_shares.share,
+        isPaid: expense_shares.paid,
       })
       .from(expenses)
       .leftJoin(
@@ -169,7 +169,6 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         )
       )
       .where(eq(expenses.group_id, groupId));
-
     // Calculate yourShare for each expense and total group debt
     let totalGroupDebt = 0;
     const expensesWithShare = groupExpenses.map((expense) => {
@@ -189,6 +188,8 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         totalGroupDebt += shareAmount;
       }
 
+      const isPaid = expense.isPaid ?? false
+
       return {
         id: expense.id,
         title: expense.title,
@@ -198,6 +199,7 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         created_by: expense.created_by,
         createdAt: expense.createdAt,
         yourShare,
+        isPaid,
       };
     });
 
