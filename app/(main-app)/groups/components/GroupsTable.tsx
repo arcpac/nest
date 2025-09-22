@@ -135,38 +135,6 @@ function GroupsTable({ groups }: { groups: GroupsProp }) {
                       </Label>
                     )}
                   </td>
-                  <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex justify-end gap-3">
-                      <Link
-                        href={`/groups/${group.id}/edit`}
-                        className="inline-flex items-center p-2 rounded hover:bg-gray-100"
-                      >
-                        <Pencil className="w-5 h-5 text-gray-600" />
-                      </Link>
-
-                      <AlertDialog>
-                        <AlertDialogTrigger>
-                          <Trash className="w-5 h-5 text-gray-600" />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will
-                              permanently delete your account and remove your
-                              data from our servers.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction>Continue</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>

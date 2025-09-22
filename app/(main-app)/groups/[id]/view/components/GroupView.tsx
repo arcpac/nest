@@ -6,6 +6,8 @@ import React, { Suspense } from "react";
 import ExpenseList from "./ExpenseList";
 import DataProvider from "@/app/DataProvider";
 import CardWrapper from "@/app/(main-app)/components/Cards";
+import { Expenses } from "@/app/types";
+
 type GroupProps = {
   id: string;
   name: string;
@@ -23,17 +25,6 @@ type MembersProps = {
   email: string | null;
   joined_at: Date;
 }[];
-type ExpensesProps = {
-  id: string;
-  title: string;
-  amount: string;
-  description: string | null;
-  isEqual: boolean;
-  created_by: string;
-  createdAt: Date;
-  yourShare: string;
-  isPaid: boolean;
-}[];
 
 function GroupView({
   group,
@@ -43,7 +34,7 @@ function GroupView({
 }: {
   group: GroupProps;
   members: MembersProps;
-  expenses: ExpensesProps;
+  expenses: Expenses;
   totalGroupDebt: string;
 }) {
   const totalActiveExpenses = expenses.length;

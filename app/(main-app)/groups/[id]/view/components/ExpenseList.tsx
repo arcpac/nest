@@ -2,23 +2,13 @@ import { lusitana } from "@/app/ui/fonts";
 import React from "react";
 import Link from "next/link";
 import ExpenseItem from "./ExpenseItem";
-type ExpensesProps = {
-  id: string;
-  title: string;
-  amount: string;
-  description: string | null;
-  isEqual: boolean;
-  created_by: string;
-  createdAt: Date;
-  yourShare: string;
-  isPaid: boolean;
-}[];
+import { Expenses } from "@/app/types";
 
 const ExpenseList = ({
   expenses,
   groupId,
 }: {
-  expenses: ExpensesProps;
+  expenses: Expenses;
   groupId: string;
 }) => {
   return (
@@ -43,6 +33,9 @@ const ExpenseList = ({
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Expense
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Participants
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount / Your Share
