@@ -2,13 +2,13 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { CardsSkeleton } from "@/components/ui/skeleton";
 import DataProvider, { useDataStore } from "@/app/DataProvider";
 import CardWrapper from "../../components/Cards";
 import { HouseholdSkeleton } from "./HouseholdSkeleton";
 import GroupsTable from "./GroupsTable";
 import { lusitana } from "@/app/ui/fonts";
 import { Group } from "@/app/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const GroupsView = () => {
   const groups = useDataStore((state) => state.groups);
@@ -24,7 +24,7 @@ const GroupsView = () => {
         </div>
       </div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Suspense fallback={<CardsSkeleton />}>
+        <Suspense fallback={<Skeleton />}>
           <CardWrapper />
         </Suspense>
       </div>

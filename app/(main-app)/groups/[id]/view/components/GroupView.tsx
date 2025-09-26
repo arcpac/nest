@@ -1,12 +1,13 @@
 "use client";
 
 import { lusitana } from "@/app/ui/fonts";
-import { CardsSkeleton } from "@/components/ui/skeleton";
+
 import React, { Suspense } from "react";
 import ExpenseList from "./ExpenseList";
 import DataProvider from "@/app/DataProvider";
 import CardWrapper from "@/app/(main-app)/components/Cards";
 import { Expenses } from "@/app/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type GroupProps = {
   id: string;
@@ -44,7 +45,7 @@ function GroupView({
         {group.name}
       </h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Suspense fallback={<CardsSkeleton />}>
+        <Suspense fallback={<Skeleton />}>
           <CardWrapper />
         </Suspense>
       </div>

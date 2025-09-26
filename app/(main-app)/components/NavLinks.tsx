@@ -15,7 +15,7 @@ const links = [
   { name: "Members", href: "/members", icon: UsersIcon },
 ];
 
-export default function NavLinks({ collapse }: { collapse: Boolean }) {
+export default function NavLinks() {
   const pathname = usePathname();
   const segmentName = pathname.split("/").pop();
 
@@ -38,7 +38,7 @@ export default function NavLinks({ collapse }: { collapse: Boolean }) {
             )}
           >
             <LinkIcon className="w-6" />
-            {!collapse && <p className="hidden md:block">{link.name}</p>}
+            <p className="hidden md:block">{link.name}</p>
           </Link>
         );
       })}

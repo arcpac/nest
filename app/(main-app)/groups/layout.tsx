@@ -23,7 +23,7 @@ export default async function GroupsLayout({
       initialGroups={groups}
       initialExpenseData={{ totalDebt: totalDebt, totalActiveExpenses: 0 }}
     >
-      <div>{children}</div>
+      {children}
     </DataProvider>
   );
 }
