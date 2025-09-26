@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 
-import { getUserGroups } from "../actions/groups";
 import { redirect } from "next/navigation";
 import GroupsView from "./components/GroupsView";
 
@@ -11,13 +10,8 @@ const GroupsPage = async () => {
   if (!session?.user?.id) {
     redirect("/login");
   }
-  const { userGroups: groups, totalDebt } = await getUserGroups(
-    session.user.id
-  );
 
-  console.log('groups', groups)
-
-  return <GroupsView groups={groups} totalDebt={totalDebt} />;
+  return <GroupsView />;
 };
 
 export default GroupsPage;

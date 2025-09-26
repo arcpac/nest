@@ -18,6 +18,7 @@ export interface Group {
   created_at: Date;
 }
 
+
 export interface GroupWithCreator extends Group {
   creator_username: string | null;
   creator_email: string | null;
@@ -47,7 +48,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
@@ -78,7 +79,7 @@ export interface BaseComponentProps {
 }
 
 // Status types
-export type Status = 'pending' | 'loading' | 'success' | 'error';
+export type Status = "pending" | "loading" | "success" | "error";
 
 export interface StatusState {
   status: Status;

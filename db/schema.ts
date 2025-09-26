@@ -23,7 +23,7 @@ export const users = pgTable("users", {
 export const groups = pgTable("groups", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
-  active: boolean("active").default(true),
+  active: boolean("active").default(true).notNull(),
   created_by: uuid("created_by")
     .notNull()
     .references(() => users.id),

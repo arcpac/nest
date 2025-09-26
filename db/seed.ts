@@ -65,6 +65,30 @@ async function seed() {
     ])
     .returning();
 
+  const [groupProject] = await db
+    .insert(groups)
+    .values([
+      {
+        id: randomUUID(),
+        name: "Group Project 1",
+        created_by: user.id,
+        active: true,
+      },
+    ])
+    .returning();
+
+  const [groupProject2] = await db
+    .insert(groups)
+    .values([
+      {
+        id: randomUUID(),
+        name: "Group Project 2",
+        created_by: user.id,
+        active: true,
+      },
+    ])
+    .returning();
+
   // Seed members
   const seededMembers = await db
     .insert(members)
@@ -90,6 +114,28 @@ async function seed() {
         group_id: group.id,
         user_id: charlieUser.id, // for charlie@example.com
         email: charlieUser.email,
+      },
+    ])
+    .returning();
+
+  const seededMembersToGroupProjects = await db
+    .insert(members)
+    .values([
+      {
+        id: randomUUID(),
+        first_name: "anton",
+        last_name: "cab",
+        group_id: groupProject.id,
+        user_id: user.id,
+        email: user.email,
+      },
+      {
+        id: randomUUID(),
+        first_name: "anton",
+        last_name: "cab",
+        group_id: groupProject2.id,
+        user_id: user.id,
+        email: user.email,
       },
     ])
     .returning();

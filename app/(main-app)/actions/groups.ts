@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { and, eq } from "drizzle-orm";
 
 export async function getUserGroups(userId: string) {
+  console.log("[[SERVER REQUEST]] getUserGroups");
   // Fetch groups where the user is a member (not just the creator)
   const userGroups = await db
     .select({
@@ -188,7 +189,7 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         totalGroupDebt += shareAmount;
       }
 
-      const isPaid = expense.isPaid ?? false
+      const isPaid = expense.isPaid ?? false;
 
       return {
         id: expense.id,

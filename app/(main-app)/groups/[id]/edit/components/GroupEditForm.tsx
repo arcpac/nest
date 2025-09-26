@@ -20,6 +20,8 @@ interface GroupProps {
 const GroupEditForm = ({ group }: { group: GroupProps }) => {
   const [name, setName] = useState(group.name);
   const [active, setActive] = useState(group.active);
+  console.log(name)
+  console.log(active)
   return (
     <div>
       <div>

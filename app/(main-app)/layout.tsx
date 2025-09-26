@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import MainNavBar from "./components/MainNavBar";
 import { inter, lusitana } from "../ui/fonts";
 import SideNav from "./components/Sidenav";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Pencil, Trash } from "lucide-react";
-import Link from "next/link";
+import { CheckIcon, ClockIcon, Pencil, Trash } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Expense } from "@/app/types";
+import StatusLabel from "../../../components/Status";
 
 const ExpenseItem = ({ expense }: { expense: Expense }) => {
   return (
@@ -29,11 +30,6 @@ const ExpenseItem = ({ expense }: { expense: Expense }) => {
       </td>
       <td className="px-6 py-3 whitespace-nowrap">
         <div className="flex items-center gap-3">
-          {/* <div className="size-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-700">
-              {(expense.title || "?").charAt(0).toUpperCase()}
-            </span>
-          </div> */}
           <div className="min-w-0">
             <p className="text-sm font-semibold text-gray-900 truncate">
               {expense.title}
@@ -67,39 +63,14 @@ const ExpenseItem = ({ expense }: { expense: Expense }) => {
       </td>
       <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
         <div className="flex flex-col items-end gap-1">
-          <span>${expense.amount}</span>
+          <span>${expense.yourShare}</span>
           <span className="text-xs text-gray-500">
-            Your share: ${expense.yourShare}
+            Your share: ${expense.amount}
           </span>
         </div>
       </td>
       <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-        {expense.isPaid ? (
-          <div className="flex flex-col items-end gap-1">
-            <Label
-              htmlFor="r2"
-              className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-600 px-3 py-1.5 text-xs font-medium text-white"
-            >
-              Paid
-            </Label>
-          </div>
-        ) : (
-          <div className="flex flex-col items-end gap-1">
-            <Label
-              htmlFor="r2"
-              className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-orange-400 px-3 py-1.5 text-xs font-medium text-white"
-            >
-              Pending
-            </Label>
-          </div>
-        )}
-
-        {/* <div className="flex flex-col items-end gap-1">
-          <span>${expense.amount}</span>
-          <span className="text-xs text-gray-500">
-            Your share: ${expense.yourShare}
-          </span>
-        </div> */}
+        <StatusLabel isTrue={expense.isPaid} />
       </td>
       <td className="whitespace-nowrap py-3 pr-3">
         <div className="flex justify-end gap-3">

@@ -24,7 +24,6 @@ export default async function ViewPage(props: {
     group.id,
     session.user.id
   );
-
   return (
     <GroupView
       group={group}
