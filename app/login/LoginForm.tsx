@@ -35,6 +35,8 @@ const LoginForm = () => {
         password,
         redirect: false,
       });
+
+      console.log("res", res);
       if (res?.ok) {
         router.push("/dashboard");
       } else {
@@ -53,7 +55,7 @@ const LoginForm = () => {
   return (
     <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
       <CardHeader>
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
+        <h1 className="text-2xl font-bold mb-4">Login Current</h1>
       </CardHeader>
       <CardContent>
         {fieldError?.unauthorised && (

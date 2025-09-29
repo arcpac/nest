@@ -2,12 +2,11 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import DataProvider, { useDataStore } from "@/app/DataProvider";
+import { useDataStore } from "@/app/DataProvider";
 import CardWrapper from "../../components/Cards";
 import { HouseholdSkeleton } from "./HouseholdSkeleton";
 import GroupsTable from "./GroupsTable";
 import { lusitana } from "@/app/ui/fonts";
-import { Group } from "@/app/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const GroupsView = () => {

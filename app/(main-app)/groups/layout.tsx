@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getUserId } from "@/lib/auth";
 import DataProvider from "@/app/DataProvider";
 import { getUserGroups } from "../actions/groups";
 
@@ -9,13 +7,9 @@ export default async function GroupsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/login");
+  const userId = await getUserId();
 
-  const { userGroups: groups, totalDebt } = await getUserGroups(
-    session.user.id
-  );
-  // TODO: continue to optimise layout
+  const { userGroups: groups, totalDebt } = await getUserGroups(userId);
 
   return (
     <DataProvider

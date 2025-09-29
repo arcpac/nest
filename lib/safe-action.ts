@@ -12,6 +12,5 @@ export const protectedAction = createSafeActionClient()
       throw new Error("Unauthorized");
     }
 
-    // Pass session to the action
     return next({ ctx: { session } });
   });

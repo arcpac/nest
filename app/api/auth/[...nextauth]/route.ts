@@ -1,4 +1,3 @@
-
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/db";
@@ -16,7 +15,6 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-
         if (!credentials?.email || !credentials?.password) return null;
 
         const found = await db
@@ -34,12 +32,14 @@ export const authOptions: NextAuthOptions = {
         );
         if (!isValid) return null;
 
-        return { id: user.id, name: user.name, email: user.email };
+        return { id: user.id, name: user.username, email: user.email };
       },
     }),
   ],
   session: {
     strategy: "jwt",
+    maxAge: 1 * 24 * 60 * 60, // 1 day
+    updateAge: 24 * 60 * 60, // Refresh every 24 hours of activity
   },
   pages: {
     signIn: "/login",

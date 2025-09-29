@@ -1,7 +1,5 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { inter, lusitana } from "../ui/fonts";
+
+import { inter } from "../ui/fonts";
 
 import {
   SidebarInset,
@@ -15,8 +13,6 @@ export default async function MainAppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/login");
 
   return (
     <div className={`main-app-layout flex h-screen ${inter.className}`}>

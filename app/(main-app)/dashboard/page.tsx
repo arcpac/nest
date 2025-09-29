@@ -1,16 +1,9 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { Suspense } from "react";
 import { lusitana } from "@/app/ui/fonts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
 
   return (
     <main>

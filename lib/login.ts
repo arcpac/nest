@@ -9,7 +9,7 @@ import { actionClient } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(6),
 });
 
