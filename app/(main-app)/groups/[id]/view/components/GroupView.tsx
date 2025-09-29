@@ -1,13 +1,10 @@
 "use client";
 
-import { lusitana } from "@/app/ui/fonts";
-
 import React, { Suspense } from "react";
-import ExpenseList from "./ExpenseList";
-import DataProvider from "@/app/DataProvider";
 import CardWrapper from "@/app/(main-app)/components/Cards";
-import { Expenses, Members } from "@/app/types";
+import { Members } from "@/app/types";
 import { Skeleton } from "@/components/ui/skeleton";
+
 
 type GroupProps = {
   id: string;
@@ -18,32 +15,26 @@ type GroupProps = {
   creator_email: string | null;
 };
 
-
 function GroupView({
   group,
   members,
-  expenses,
-  totalGroupDebt,
+  userId,
+  children,
 }: {
   group: GroupProps;
   members: Members;
-  expenses: Expenses;
-  totalGroupDebt: string;
+  userId: string;
+  children: React.ReactNode;
 }) {
-
   return (
     <div>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        {group.name}
-      </h1>
+      <h1 className={`mb-4 text-xl md:text-2xl`}>{group.name}</h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Suspense fallback={<Skeleton />}>
           <CardWrapper />
         </Suspense>
       </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 ">
-        <ExpenseList expenses={expenses} members={members} groupId={group.id} />
-      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6">{children}</div>
     </div>
   );
 }

@@ -3,7 +3,6 @@ import { db } from "@/db";
 import { and, eq } from "drizzle-orm";
 
 export async function getUserGroups(userId: string) {
-  console.log("[[SERVER REQUEST]] getUserGroups");
   // Fetch groups where the user is a member (not just the creator)
   const userGroups = await db
     .select({
@@ -129,7 +128,10 @@ export async function getGroupWithMembers(groupId: string) {
 
 export async function getGroupExpenses(groupId: string, userId: string) {
   try {
+    // Artificial delay to test Suspense fallbacks
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     // First get the member ID for the user in this group
+
     const member = await db
       .select({ memberId: members.id })
       .from(members)
@@ -169,9 +171,10 @@ export async function getGroupExpenses(groupId: string, userId: string) {
           eq(expense_shares.member_id, member.memberId)
         )
       )
-      .where(eq(expenses.group_id, groupId));
+      .where(and(eq(expenses.group_id, groupId)));
     // Calculate yourShare for each expense and total group debt
     let totalGroupDebt = 0;
+    
     const expensesWithShare = groupExpenses.map((expense) => {
       let yourShare: string;
 

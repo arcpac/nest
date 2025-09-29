@@ -1,16 +1,16 @@
 "use client";
-
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
-import React, { useState } from "react";
-import { loginUser } from "../../lib/login";
-import { useRouter } from "next/navigation";
-import { CardContent, CardHeader } from "@/components/ui/card";
-import Link from "next/link";
+import { loginUser } from "@/lib/login";
 import { signIn } from "next-auth/react";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import SocialLogin from "./SocialLogin";
 
 type FormErrors =
   | {
@@ -20,7 +20,7 @@ type FormErrors =
     }
   | undefined;
 
-const LoginForm = () => {
+export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +36,6 @@ const LoginForm = () => {
         redirect: false,
       });
 
-      console.log("res", res);
       if (res?.ok) {
         router.push("/dashboard");
       } else {
@@ -53,72 +52,86 @@ const LoginForm = () => {
   });
 
   return (
-    <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-      <CardHeader>
-        <h1 className="text-2xl font-bold mb-4">Login Current</h1>
-      </CardHeader>
-      <CardContent>
-        {fieldError?.unauthorised && (
-          <div className="text-red-600">{fieldError.unauthorised}</div>
-        )}
-        <div className="mb-4">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={cn(fieldError?.email ? "border-red-500" : "")}
-            placeholder={cn(
-              fieldError?.email ? "Enter valid email" : "Enter your email"
-            )}
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={cn(fieldError?.password ? "border-red-500" : "")}
-            placeholder="Enter password"
-            required
-          />
-        </div>
-        <Button
-          onClick={() => {
-            const localError: FormErrors = {};
+    <div className={cn("flex flex-col gap-6")}>
+      <Card className="overflow-hidden p-0">
+        <CardContent className="grid p-0 md:grid-cols-2">
+          {fieldError?.unauthorised && (
+            <div className="text-red-600">{fieldError.unauthorised}</div>
+          )}
+          <div className="p-6 md:p-8">
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col items-center text-center">
+                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <p className="text-muted-foreground text-balance">
+                  Login to your Acme Inc account
+                </p>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="m@example.com"
+                  required
+                />
+              </div>
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <a
+                    href="#"
+                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                  >
+                    Forgot your password?
+                  </a>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={() => {
+                  const localError: FormErrors = {};
 
-            if (!email.trim()) {
-              localError.email = ["Email is required"];
-            }
-            if (!password.trim()) {
-              localError.password = ["Password is required"];
-            }
+                  if (!email.trim()) {
+                    localError.email = ["Email is required"];
+                  }
+                  if (!password.trim()) {
+                    localError.password = ["Password is required"];
+                  }
 
-            if (Object.keys(localError).length > 0) {
-              setFieldErrors(localError);
-              return;
-            }
-            setFieldErrors(undefined);
-            handleLoginUser({ email, password });
-          }}
-        >
-          Login
-        </Button>
-        <div>
-          <p>
-            You don't have an account?
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Signup here
-            </Link>
-          </p>
-        </div>
-      </CardContent>
+                  if (Object.keys(localError).length > 0) {
+                    setFieldErrors(localError);
+                    return;
+                  }
+                  setFieldErrors(undefined);
+                  handleLoginUser({ email, password });
+                }}
+              >
+                Login
+              </Button>
+              <SocialLogin />
+            </div>
+          </div>
+          <div className="bg-muted relative hidden md:block">
+            <img
+              src="/placeholder.svg"
+              alt="Image"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            />
+          </div>
+        </CardContent>
+      </Card>
+      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>.
+      </div>
     </div>
   );
-};
-
-export default LoginForm;
+}

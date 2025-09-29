@@ -1,6 +1,4 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { decrypt } from "./lib/session";
 import { getToken } from "next-auth/jwt";
 
 const protectedRoutes = ["/groups"];
@@ -13,7 +11,7 @@ export default async function middleware(req: NextRequest) {
 
   // Get the JWT token from next-auth
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  console.log("token middleware", token);
+
   if (isProtectedRoute && !token?.id)
     return NextResponse.redirect(new URL("/login", req.url));
 

@@ -24,6 +24,13 @@ async function seed() {
 
   async function generateRandomUsers(count: number) {
     const result = [];
+    result.push({
+      id: randomUUID(),
+      username: "admin",
+      role: "user",
+      email: "admin@example.com",
+      password: await bcrypt.hash("Pass123!.", 10),
+    });
     for (let i = 0; i < count; i++) {
       result.push({
         id: randomUUID(),
@@ -37,7 +44,6 @@ async function seed() {
   }
 
   async function seedUsers() {
-
     await db.execute(sql`DELETE FROM ${expense_shares}`);
     await db.execute(sql`DELETE FROM ${expenses}`);
     await db.execute(sql`DELETE FROM ${posts}`);
@@ -48,7 +54,7 @@ async function seed() {
     const newUsers = await generateRandomUsers(3);
 
     const seededUsers = await db.insert(users).values(newUsers).returning();
-    const [user1, user2, user3] = seededUsers;
+    const [user1, user2, user3, user4] = seededUsers;
 
     // create groups for those users
     const seededGroups = await db
@@ -131,43 +137,24 @@ async function seed() {
 
     const [member1, member2, member3] = seededMembers;
 
-    const seededExpenses = await db
+
+
+    // Create 10 expenses with mixed creators: admin (user1) and user2
+    const possibleCreators = [user1.id, user2.id];
+    const expenseValues = Array.from({ length: 10 }).map(() => ({
+      id: randomUUID(),
+      title: faker.person.fullName(),
+      amount: faker.commerce.price({ min: 5, max: 200, dec: 2 }),
+      description: faker.lorem.sentence(),
+      created_by:
+        possibleCreators[Math.floor(Math.random() * possibleCreators.length)],
+      group_id: group1.id,
+    }));
+
+    await db
       .insert(expenses)
-      .values([
-        {
-          id: randomUUID(),
-          title: "Rice",
-          amount: "34.99",
-          description: "For 3 months",
-          created_by: user1.id, // use the actual user ID
-          group_id: group1.id, // use the actual group ID
-        },
-        {
-          id: randomUUID(),
-          title: "Coffee beans",
-          amount: "26.99",
-          description: "Coffee stock",
-          created_by: user1.id, // use the actual user ID
-          group_id: group1.id, // use the actual group ID
-        },
-      ])
+      .values(expenseValues)
       .returning();
-
-    const [expense1, expense2] = seededExpenses;
-
-    await db.insert(expense_shares).values({
-      expense_id: expense1.id,
-      member_id: member1.id,
-      share: "50.00",
-      paid: false,
-    });
-
-    await db.insert(expense_shares).values({
-      expense_id: expense1.id,
-      member_id: member2.id,
-      share: "50.00",
-      paid: false,
-    });
   }
 
   await seedUsers();

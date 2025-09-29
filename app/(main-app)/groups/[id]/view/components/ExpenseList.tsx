@@ -1,7 +1,7 @@
 "use client";
 
-import { lusitana } from "@/app/ui/fonts";
-import React, { useState, useMemo } from "react";
+
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import ExpenseItem from "./ExpenseItem";
 import { Expenses, Member } from "@/app/types";
@@ -31,16 +31,15 @@ const ExpenseList = ({
     return selectedExpenses.size > 0 && selectedExpenses.size < expenses.length;
   }, [selectedExpenses.size, expenses.length]);
 
-  // Handle select all checkbox
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
+  const handleSelectAll = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    if (isChecked) {
       setSelectedExpenses(new Set(expenses.map((expense) => expense.id)));
     } else {
       setSelectedExpenses(new Set());
     }
   };
 
-  // Handle individual expense selection
   const handleExpenseSelect = (expenseId: string, checked: boolean) => {
     const newSelected = new Set(selectedExpenses);
     if (checked) {
@@ -51,14 +50,10 @@ const ExpenseList = ({
     setSelectedExpenses(newSelected);
   };
 
-  console.log("selectedExpenses", selectedExpenses);
-
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="flex flex-row justify-between">
-        <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-          Expenses
-        </h2>
+        <h2 className={`mb-4 text-xl md:text-2xl`}>Expenses</h2>
         <div className="flex text-sm text-blue-500 m-4 rounded-full border gap-3">
           <div className="cursor-pointer">Pay all</div>
           <div>
@@ -75,13 +70,8 @@ const ExpenseList = ({
               <tr>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <Checkbox
-                    checked={allSelected}
+                    checked={allSelected ? true : someSelected ? "indeterminate" : false}
                     onCheckedChange={handleSelectAll}
-                    ref={(el) => {
-                      if (el) {
-                        el.indeterminate = someSelected;
-                      }
-                    }}
                     className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                   />
                 </th>
