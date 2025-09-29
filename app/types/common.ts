@@ -18,7 +18,6 @@ export interface Group {
   created_at: Date;
 }
 
-
 export interface GroupWithCreator extends Group {
   creator_username: string | null;
   creator_email: string | null;
@@ -28,13 +27,14 @@ export interface GroupWithCreator extends Group {
 export interface Member {
   id: string;
   user_id: string;
-  group_id: string;
+  group_id?: string;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
   joined_at: Date;
 }
 
+export type Members = Member[];
 // API Response types
 export interface ApiResponse<T = any> {
   success: boolean;

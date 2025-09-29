@@ -1,28 +1,42 @@
-import { cn } from "@/lib/utils";
-import { CheckIcon, ClockIcon } from "lucide-react";
+import { cn } from "@/lib/utils"; // adjust to your cn helper
+import { Badge } from "@/components/ui/badge";
+import { Check, Loader } from "lucide-react"; // or wherever your Loader is from
 
-function StatusLabel({ isTrue }: { isTrue: boolean }) {
+type StatusLabelProps = {
+  isTrue: boolean;
+  type: "groups" | "expenses";
+};
+//  variant="secondary"
+//           className="bg-blue-500 text-white dark:bg-blue-600"
+export function StatusLabel({ isTrue, type }: StatusLabelProps) {
+  // map statuses by type
+  const statusMap = {
+    groups: {
+      true: { label: "Active", variant: "default" as const },
+      false: { label: "Inactive", variant: "secondary" as const },
+    },
+    expenses: {
+      true: { label: "Paid", variant: "default" as const },
+      false: { label: "Pending", variant: "outline" as const },
+    },
+  };
+
+  const status = statusMap[type][isTrue ? "true" : "false"];
+
   return (
-    <span
-      className={cn("inline-flex items-center rounded-full px-2 py-1 text-xs", {
-        "bg-gray-100 text-gray-500": !isTrue,
-        "bg-green-500 text-white": isTrue,
-      })}
+    <Badge
+      variant={status.variant}
+      className={cn(
+        "inline-flex items-center gap-1",
+        isTrue && "bg-blue-500 text-white dark:bg-blue-600"
+      )}
     >
-      {!isTrue ? (
-        <>
-          Pending
-          <ClockIcon className="ml-1 w-4 text-gray-500" />
-        </>
-      ) : null}
       {isTrue ? (
-        <>
-          Paid
-          <CheckIcon className="ml-1 w-4 text-white" />
-        </>
-      ) : null}
-    </span>
+        <Check className="h-3 w-3" />
+      ) : (
+        <Loader className="h-3 w-3 animate-spin" />
+      )}
+      {status.label}
+    </Badge>
   );
 }
-
-export default StatusLabel;

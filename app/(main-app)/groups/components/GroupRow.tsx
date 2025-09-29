@@ -4,7 +4,8 @@ import { Group } from "@/app/types";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { memo } from "react";
-import StatusLabel from "./Status";
+import { StatusLabel } from "./Status";
+
 
 const GroupRow = memo(({ group }: { group: Group }) => {
   return (
@@ -20,7 +21,7 @@ const GroupRow = memo(({ group }: { group: Group }) => {
       <td className="whitespace-nowrap px-3 py-3">123</td>
       <td className="whitespace-nowrap px-3 py-3">123</td>
       <td className="whitespace-nowrap px-3 py-3">
-        <StatusLabel isTrue={group.active} />
+        <StatusLabel isTrue={group.active} type="groups" />
       </td>
     </tr>
   );

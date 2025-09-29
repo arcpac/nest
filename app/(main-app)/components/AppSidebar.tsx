@@ -13,34 +13,29 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import {
-  AudioLinesIcon,
-  AudioWaveform,
+  Apple,
+  AppleIcon,
+  BarChart2Icon,
   BookOpen,
   Bot,
-  CameraIcon,
-  ChartBar,
-  Command,
-  FileIcon,
-  FolderIcon,
+  CirclePlus,
   Frame,
-  GalleryVerticalEnd,
   LayoutDashboard,
   LayoutDashboardIcon,
   LifeBuoy,
-  List,
+  ListIcon,
   Map,
   PieChart,
   Send,
   Settings2,
-  SettingsIcon,
   SquareTerminal,
   User,
   UserIcon,
 } from "lucide-react";
-import MainNavBar from "./MainNavBar";
-import { MainNav } from "./MainNav";
 import { UserNav } from "./UserNav";
 import { ItemsWithDropdown } from "./ItemsWithDropdown";
+import { NavWithChildren } from "./NavWithChildren";
+import MainNav from "./MainNav";
 
 const data = {
   user: {
@@ -48,7 +43,29 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navMain: [
+  mainNav: [
+    {
+      title: "Dashboard",
+      url: "#",
+      icon: LayoutDashboardIcon,
+    },
+    {
+      title: "Groups",
+      url: "/groups",
+      icon: ListIcon,
+    },
+    {
+      title: "Expenses",
+      url: "#",
+      icon: ListIcon,
+    },
+    {
+      title: "Analytics",
+      url: "#",
+      icon: BarChart2Icon,
+    },
+  ],
+  navWithChildren: [
     {
       title: "Playground",
       url: "#",
@@ -164,12 +181,10 @@ const data = {
       icon: Map,
     },
   ],
-}
-
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { toggleSidebar } = useSidebar();
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -178,21 +193,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
-              tooltip="Account"
             >
-              <a href="#">
-                <LayoutDashboard
-                  className="!size-5"
-                  onClick={() => toggleSidebar()}
-                />
+              <div onClick={() => toggleSidebar()}>
+                <AppleIcon className="!size-5" />
                 <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <MainNav items={data.navMain} />
+        <MainNav items={data.mainNav} />
+        <NavWithChildren items={data.navWithChildren} />
         <ItemsWithDropdown projects={data.projects} />
         {/* <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" /> */}

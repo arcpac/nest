@@ -11,6 +11,7 @@ import {
 } from "./schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
+import { faker } from "@faker-js/faker";
 
 async function seed() {
   // Clear tables (reverse dependency order!)
@@ -21,186 +22,156 @@ async function seed() {
   await db.execute(sql`DELETE FROM ${groups}`);
   await db.execute(sql`DELETE FROM ${users}`);
 
-  // Seed users
-
-  const seededUsers = await db
-    .insert(users)
-    .values([
-      {
+  async function generateRandomUsers(count: number) {
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      result.push({
         id: randomUUID(),
-        username: "anton",
-        role: "admin",
-        email: "anton@example.com",
-        password: await bcrypt.hash("Pass123!.", 10),
-      },
-      {
-        id: randomUUID(),
-        username: "beta",
+        username: faker.internet.username(),
         role: "user",
-        email: "beta@example.com",
+        email: faker.internet.email(),
         password: await bcrypt.hash("Pass123!.", 10),
-      },
-      {
-        id: randomUUID(),
-        username: "charlie",
-        role: "user",
-        email: "charlie@example.com",
-        password: await bcrypt.hash("Pass123!.", 10),
-      },
-    ])
-    .returning();
+      });
+    }
+    return result;
+  }
 
-  const [user, betaUser, charlieUser] = seededUsers;
+  async function seedUsers() {
 
-  // Seed groups
-  const [group] = await db
-    .insert(groups)
-    .values([
-      {
-        id: randomUUID(),
-        name: "My Apartment",
-        created_by: user.id,
-        active: true,
-      },
-    ])
-    .returning();
+    await db.execute(sql`DELETE FROM ${expense_shares}`);
+    await db.execute(sql`DELETE FROM ${expenses}`);
+    await db.execute(sql`DELETE FROM ${posts}`);
+    await db.execute(sql`DELETE FROM ${members}`);
+    await db.execute(sql`DELETE FROM ${groups}`);
+    await db.execute(sql`DELETE FROM ${users}`);
+    // create 8 users
+    const newUsers = await generateRandomUsers(3);
 
-  const [groupProject] = await db
-    .insert(groups)
-    .values([
-      {
-        id: randomUUID(),
-        name: "Group Project 1",
-        created_by: user.id,
-        active: true,
-      },
-    ])
-    .returning();
+    const seededUsers = await db.insert(users).values(newUsers).returning();
+    const [user1, user2, user3] = seededUsers;
 
-  const [groupProject2] = await db
-    .insert(groups)
-    .values([
-      {
-        id: randomUUID(),
-        name: "Group Project 2",
-        created_by: user.id,
-        active: true,
-      },
-    ])
-    .returning();
+    // create groups for those users
+    const seededGroups = await db
+      .insert(groups)
+      .values([
+        {
+          id: randomUUID(),
+          name: faker.company.name(), // 👈 more realistic than bicycle
+          created_by: user1.id,
+          active: true,
+        },
+        {
+          id: randomUUID(),
+          name: faker.company.name(),
+          created_by: user1.id,
+          active: true,
+        },
+        {
+          id: randomUUID(),
+          name: faker.company.name(),
+          created_by: user2.id,
+          active: true,
+        },
+      ])
+      .returning();
 
-  // Seed members
-  const seededMembers = await db
-    .insert(members)
-    .values([
-      {
-        id: randomUUID(),
-        first_name: "anton",
-        last_name: "cab",
-        group_id: group.id,
-        user_id: user.id,
-        email: user.email,
-      },
-      {
-        id: randomUUID(),
-        first_name: "beta",
-        last_name: "ateb",
-        group_id: group.id,
-        user_id: betaUser.id, // for beta@example.com
-        email: betaUser.email,
-      },
-      {
-        id: randomUUID(),
-        group_id: group.id,
-        user_id: charlieUser.id, // for charlie@example.com
-        email: charlieUser.email,
-      },
-    ])
-    .returning();
+    const [group1, group2, group3] = seededGroups;
 
-  const seededMembersToGroupProjects = await db
-    .insert(members)
-    .values([
-      {
-        id: randomUUID(),
-        first_name: "anton",
-        last_name: "cab",
-        group_id: groupProject.id,
-        user_id: user.id,
-        email: user.email,
-      },
-      {
-        id: randomUUID(),
-        first_name: "anton",
-        last_name: "cab",
-        group_id: groupProject2.id,
-        user_id: user.id,
-        email: user.email,
-      },
-    ])
-    .returning();
+    const seededMembers = await db
+      .insert(members)
+      .values([
+        {
+          id: randomUUID(),
+          first_name: faker.person.firstName(),
+          last_name: faker.person.lastName(),
+          group_id: group1.id,
+          user_id: user1.id,
+          email: user1.email,
+        },
+        {
+          id: randomUUID(),
+          first_name: faker.person.firstName(),
+          last_name: faker.person.lastName(),
+          group_id: group1.id,
+          user_id: user2.id,
+          email: user2.email,
+        },
+        {
+          id: randomUUID(),
+          first_name: faker.person.firstName(),
+          last_name: faker.person.lastName(),
+          group_id: group2.id,
+          user_id: user3.id,
+          email: user3.email,
+        },
+      ])
+      .returning();
 
-  const [member1, member2, member3] = seededMembers;
+    const seededMembersToGroupProjects = await db
+      .insert(members)
+      .values([
+        {
+          id: randomUUID(),
+          first_name: "anton",
+          last_name: "cab",
+          group_id: group2.id,
+          user_id: user1.id,
+          email: user1.email,
+        },
+        {
+          id: randomUUID(),
+          first_name: "anton",
+          last_name: "cab",
+          group_id: group3.id,
+          user_id: user2.id,
+          email: user2.email,
+        },
+      ])
+      .returning();
 
-  const seededExpenses = await db
-    .insert(expenses)
-    .values([
-      {
-        id: randomUUID(),
-        title: "Rice",
-        amount: "34.99",
-        description: "For 3 months",
-        created_by: user.id, // use the actual user ID
-        group_id: group.id, // use the actual group ID
-      },
-      {
-        id: randomUUID(),
-        title: "Coffee beans",
-        amount: "26.99",
-        description: "Coffee stock",
-        created_by: user.id, // use the actual user ID
-        group_id: group.id, // use the actual group ID
-      },
-    ])
-    .returning();
+    const [member1, member2, member3] = seededMembers;
 
-  const [expense1, expense2] = seededExpenses;
+    const seededExpenses = await db
+      .insert(expenses)
+      .values([
+        {
+          id: randomUUID(),
+          title: "Rice",
+          amount: "34.99",
+          description: "For 3 months",
+          created_by: user1.id, // use the actual user ID
+          group_id: group1.id, // use the actual group ID
+        },
+        {
+          id: randomUUID(),
+          title: "Coffee beans",
+          amount: "26.99",
+          description: "Coffee stock",
+          created_by: user1.id, // use the actual user ID
+          group_id: group1.id, // use the actual group ID
+        },
+      ])
+      .returning();
 
-  // // Seed expense shares
+    const [expense1, expense2] = seededExpenses;
 
-  await db.insert(expense_shares).values({
-    expense_id: expense1.id,
-    member_id: member1.id,
-    share: "50.00",
-    paid: false,
-  });
+    await db.insert(expense_shares).values({
+      expense_id: expense1.id,
+      member_id: member1.id,
+      share: "50.00",
+      paid: false,
+    });
 
-  await db.insert(expense_shares).values({
-    expense_id: expense1.id,
-    member_id: member2.id,
-    share: "50.00",
-    paid: false,
-  });
+    await db.insert(expense_shares).values({
+      expense_id: expense1.id,
+      member_id: member2.id,
+      share: "50.00",
+      paid: false,
+    });
+  }
 
-  // // Seed posts
-  // await db.insert(posts).values([
-  //   {
-  //     title: "Welcome to our group!",
-  //     body: "This is our first post in the apartment group. Let's keep track of our expenses and communicate here.",
-  //     user_id: "00000000-0000-0000-0000-000000000001",
-  //     group_id: "10000000-0000-0000-0000-000000000001",
-  //     status: "published",
-  //   },
-  //   {
-  //     title: "Monthly Budget Meeting",
-  //     body: "Let's schedule a meeting to discuss our monthly budget and upcoming expenses.",
-  //     user_id: "00000000-0000-0000-0000-000000000001",
-  //     group_id: "10000000-0000-0000-0000-000000000001",
-  //     status: "draft",
-  //   },
-  // ]);
-
-  console.log("✅ Seeded all tables successfully");
+  await seedUsers();
+  console.log("✅ Seeding completed successfully");
   process.exit(0);
 }
 

@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 import ExpenseList from "./ExpenseList";
 import DataProvider from "@/app/DataProvider";
 import CardWrapper from "@/app/(main-app)/components/Cards";
-import { Expenses } from "@/app/types";
+import { Expenses, Members } from "@/app/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type GroupProps = {
@@ -18,14 +18,6 @@ type GroupProps = {
   creator_email: string | null;
 };
 
-type MembersProps = {
-  id: string;
-  user_id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  joined_at: Date;
-}[];
 
 function GroupView({
   group,
@@ -34,11 +26,11 @@ function GroupView({
   totalGroupDebt,
 }: {
   group: GroupProps;
-  members: MembersProps;
+  members: Members;
   expenses: Expenses;
   totalGroupDebt: string;
 }) {
-  const totalActiveExpenses = expenses.length;
+
   return (
     <div>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -50,7 +42,7 @@ function GroupView({
         </Suspense>
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 ">
-        <ExpenseList expenses={expenses} groupId={group.id} />
+        <ExpenseList expenses={expenses} members={members} groupId={group.id} />
       </div>
     </div>
   );
