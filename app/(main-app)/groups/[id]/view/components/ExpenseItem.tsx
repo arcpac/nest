@@ -80,7 +80,7 @@ const ExpenseItem = ({
   return (
     <tr className="hover:bg-blue-50">
       {/* checkbox */}
-      <td className="px-3 py-3 whitespace-nowrap">
+      <td className="px-3 py-3 whitespace-nowrap hidden sm:table-cell">
         <Checkbox
           checked={isSelected}
           onCheckedChange={onSelect}
@@ -113,7 +113,7 @@ const ExpenseItem = ({
         </div>
       </td>
       {/* payer */}
-      <td className="px-6 py-3 whitespace-nowrap">
+      <td className="px-6 py-3 whitespace-nowrap hidden md:table-cell">
         <div className="flex items-center gap-3">
           <div className="min-w-0">
             {expense.description && (
@@ -121,26 +121,6 @@ const ExpenseItem = ({
                 {payee?.first_name} {payee?.last_name}
               </p>
             )}
-          </div>
-        </div>
-      </td>
-      {/* participants */}
-      <td className="px-6 py-3 whitespace-nowrap">
-        <div className="flex items-center gap-3">
-          <div className="size-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-700">
-              {(expense.title || "?").charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div className="size-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-700">
-              {(expense.title || "?").charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div className="size-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-700">
-              {(expense.title || "?").charAt(0).toUpperCase()}
-            </span>
           </div>
         </div>
       </td>
@@ -152,10 +132,10 @@ const ExpenseItem = ({
           </span>
         </div>
       </td>
-      <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+      <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right hidden sm:table-cell">
         <StatusLabel isTrue={expense.isPaid} type={"expenses"} />
       </td>
-      <td className="whitespace-nowrap py-3 pr-3">
+      <td className="whitespace-nowrap py-3 pr-3 hidden sm:table-cell">
         <div className="flex justify-end gap-3">
           <div className="inline-flex items-center p-2 rounded hover:bg-gray-100">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>

@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import ExpenseItem from "./ExpenseItem";
@@ -16,7 +15,9 @@ const ExpenseList = ({
   members: Member[];
   groupId: string;
 }) => {
-  // State for selected expenses
+
+
+
   const [selectedExpenses, setSelectedExpenses] = useState<Set<string>>(
     new Set()
   );
@@ -64,13 +65,20 @@ const ExpenseList = ({
         </div>
       </div>
       <div className="rounded-xl bg-gray-50 p-4">
-        <div className="bg-white rounded-lg overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-lg">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full min-w-[900px] md:min-w-0">
             <thead className="border-b">
               <tr>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   <Checkbox
-                    checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                    checked={
+                      allSelected
+                        ? true
+                        : someSelected
+                        ? "indeterminate"
+                        : false
+                    }
                     onCheckedChange={handleSelectAll}
                     className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                   />
@@ -81,19 +89,16 @@ const ExpenseList = ({
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Expense
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   Payer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Participants
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount / Your Share
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   Status
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   Actions
                 </th>
               </tr>
@@ -111,7 +116,8 @@ const ExpenseList = ({
                 />
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       </div>
     </div>

@@ -37,7 +37,7 @@ export function LoginForm() {
       });
 
       if (res?.ok) {
-        router.push("/dashboard");
+        router.push("/groups");
       } else {
         setFieldErrors({
           unauthorised: ["Incorrect email and password."],
@@ -51,32 +51,33 @@ export function LoginForm() {
     },
   });
 
+  console.log("fieldError", fieldError);
+
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          {fieldError?.unauthorised && (
-            <div className="text-red-600">{fieldError.unauthorised}</div>
-          )}
           <div className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground text-balance">
                   Login to your Acme Inc account
                 </p>
               </div>
-              <div className="grid gap-3">
+
+              <div className="grid gap-3 pt-6">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  className={fieldError?.password && `border border-red-600`}
                   type="email"
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="m@example.com"
                   required
                 />
               </div>
-              <div className="grid gap-3">
+              <div className="grid gap-3 pt-6">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <a
@@ -89,13 +90,14 @@ export function LoginForm() {
                 <Input
                   id="password"
                   type="password"
+                  className={fieldError?.password && `border border-red-600`}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full mt-6"
                 onClick={() => {
                   const localError: FormErrors = {};
 
@@ -119,12 +121,8 @@ export function LoginForm() {
               <SocialLogin />
             </div>
           </div>
-          <div className="bg-muted relative hidden md:block">
-            <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+          <div className="relative hidden md:block bg-[url('/login/loginLogo.png')] bg-no-repeat bg-center bg-contain">
+            <div className=""></div>
           </div>
         </CardContent>
       </Card>

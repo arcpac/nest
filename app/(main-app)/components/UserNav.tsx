@@ -24,6 +24,7 @@ import {
   LogOut,
   UserCircle,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 export function UserNav({
   user,
@@ -94,7 +95,7 @@ export function UserNav({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem  onClick={() => signOut({callbackUrl: "/login"})}>
               <LogOut />
               Log out
             </DropdownMenuItem>

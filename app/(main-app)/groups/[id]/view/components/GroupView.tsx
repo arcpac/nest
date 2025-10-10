@@ -1,4 +1,3 @@
-"use client";
 
 import React, { Suspense } from "react";
 import CardWrapper from "@/app/(main-app)/components/Cards";
