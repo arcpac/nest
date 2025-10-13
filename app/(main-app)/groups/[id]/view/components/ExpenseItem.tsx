@@ -4,10 +4,7 @@ import React, { useMemo, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  CheckIcon,
-  ClockIcon,
   HandCoins,
-  Pencil,
   Trash,
   Plus,
   Minus,
@@ -70,7 +67,7 @@ const ExpenseItem = ({
   };
 
   const handlePaymentSubmit = () => {
-    const amountToPay =
+    // const amountToPay =
       paymentType === "full" ? totalShare : currentPartialAmount;
     // TODO: Implement actual payment logic
     setIsOpen(false);

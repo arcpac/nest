@@ -2,9 +2,7 @@
 import { inter } from "../ui/fonts";
 
 import {
-  SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 

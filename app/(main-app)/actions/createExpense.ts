@@ -6,9 +6,10 @@ import { flattenValidationErrors } from "next-safe-action";
 import { expenses, expense_shares, members } from "@/db/schema";
 import { db } from "@/db";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth";
 
 const expenseSchema = z.object({
   title: z.string().min(1).max(50),
@@ -37,7 +38,7 @@ export const createExpense = actionClient
         selectedMemberIds,
       },
     }) => {
-      const session = await getServerSession(authOptions);
+      const session = await getServerSession();
       if (!session?.user?.id) {
         redirect("/login");
       }

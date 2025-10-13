@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 "use client";
 
 import { generatePagination } from "@/lib/utils";

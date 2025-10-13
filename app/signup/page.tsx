@@ -1,6 +1,5 @@
-import { Toaster } from "sonner";
+
 import SignupForm from "./components/SignupForm";
-import Link from "next/link";
 
 export default function SignupPage() {
 

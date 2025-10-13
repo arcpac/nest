@@ -16,13 +16,13 @@ type GroupProps = {
 
 function GroupView({
   group,
-  members,
-  userId,
+  // members,
+  // userId,
   children,
 }: {
   group: GroupProps;
-  members: Members;
-  userId: string;
+  // members: Members;
+  // userId: string;
   children: React.ReactNode;
 }) {
   return (

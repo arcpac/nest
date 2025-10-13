@@ -6,7 +6,6 @@ import { Group } from "@/app/types";
 import { useMemo, useState } from "react";
 
 function GroupsTable({ groups }: { groups: Group[] }) {
-  const [count, setCount] = useState(0);
   const stableGroups = useMemo(() => groups, [groups]);
 
   return (

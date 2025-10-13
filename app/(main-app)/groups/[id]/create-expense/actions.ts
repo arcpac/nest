@@ -3,7 +3,6 @@
 import { db } from "@/db";
 import { expenses, expense_shares, members } from "@/db/schema";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
@@ -18,7 +17,7 @@ interface CreateExpenseData {
 
 export async function createExpense(data: CreateExpenseData) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       redirect("/login");
     }

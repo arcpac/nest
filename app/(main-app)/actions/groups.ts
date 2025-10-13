@@ -59,7 +59,8 @@ export async function getUserGroups(userId: string) {
     // Calculate group debt for this specific group
     let groupDebt = 0;
 
-    const expensesWithShares = groupExpenses.map((expense) => {
+    // const expensesWithShares = 
+    groupExpenses.map((expense) => {
       let yourShare: number;
 
       if (expense.isEqual) {

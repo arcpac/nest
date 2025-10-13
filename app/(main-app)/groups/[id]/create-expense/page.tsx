@@ -1,14 +1,13 @@
 import React from "react";
 import { getGroupWithMembers } from "@/app/(main-app)/actions/groups";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import CreateExpenseForm from "./components/CreateExpenseForm";
 
 export default async function CreateExpensePage(props: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
   if (!session?.user?.id) {
     redirect("/login");
   }

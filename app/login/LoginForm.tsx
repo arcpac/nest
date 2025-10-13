@@ -29,7 +29,7 @@ export function LoginForm() {
   );
 
   const { execute: handleLoginUser } = useAction(loginUser, {
-    onSuccess: async ({ data }) => {
+    onSuccess: async ({  }) => {
       const res = await signIn("credentials", {
         email,
         password,

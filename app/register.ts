@@ -34,7 +34,7 @@ export const registerUser = actionClient
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     await db.insert(users).values({
-      name,
+      username: name,
       email,
       password: hashedPassword,
     });
