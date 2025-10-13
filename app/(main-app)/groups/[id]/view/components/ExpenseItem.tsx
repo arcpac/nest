@@ -72,7 +72,6 @@ const ExpenseItem = ({
   const handlePaymentSubmit = () => {
     const amountToPay =
       paymentType === "full" ? totalShare : currentPartialAmount;
-    console.log("Paying amount:", amountToPay);
     // TODO: Implement actual payment logic
     setIsOpen(false);
   };

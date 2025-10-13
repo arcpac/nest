@@ -61,7 +61,7 @@ export default function CreateExpenseForm({
       [memberId]: value,
     }));
   };
-  console.log("members", members);
+
   return (
     <Card>
       <CardHeader>

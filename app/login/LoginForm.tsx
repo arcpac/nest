@@ -51,8 +51,6 @@ export function LoginForm() {
     },
   });
 
-  console.log("fieldError", fieldError);
-
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card className="overflow-hidden p-0">

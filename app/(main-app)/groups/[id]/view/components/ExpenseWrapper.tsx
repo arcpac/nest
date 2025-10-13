@@ -13,8 +13,9 @@ export default async function ExpenseWrapper({
   members: Members;
 }) {
   const { expenses } = await getGroupExpenses(groupId, userId);
-
   return (
-    <ExpenseList expenses={expenses} members={members} groupId={groupId} />
+    <>
+      <ExpenseList expenses={expenses} members={members} groupId={groupId} />
+    </>
   );
 }
