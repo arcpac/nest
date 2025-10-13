@@ -33,24 +33,28 @@ export default function CardWrapper() {
   const totalActiveExpenses = useDataStore(
     (state) => state.totalActiveExpenses
   );
+
   return (
     <>
-      <Card className="@container/card">
-        <CardHeader>
+      <Card className="w-full max-w-sm p-4">
+        <CardHeader className="p-0 flex flex-col">
           <CardDescription>Total Debt</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ${totalDebt}
-          </CardTitle>
-          <CardAction>
-            <Badge
-              variant={"outline"}
-              className={cn("inline-flex items-center gap-1")}
-            >
-              +12.5%
-            </Badge>
-          </CardAction>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              ${totalDebt}
+            </CardTitle>
+            <CardAction>
+              <Badge
+                variant="outline"
+                className="inline-flex items-center gap-1"
+              >
+                +12.5%
+              </Badge>
+            </CardAction>
+          </div>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+
+        <CardFooter className="p-0 mt-2 flex flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Trending up this month <TrendingUp className="size-4" />
           </div>
@@ -59,73 +63,27 @@ export default function CardWrapper() {
           </div>
         </CardFooter>
       </Card>
-      {/*  */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Expenses This Month</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
-          </CardTitle>
-          <CardAction>
-            <Badge
-              variant={"outline"}
-              className={cn("inline-flex items-center gap-1")}
-            >
-              +12.5%
-            </Badge>
-          </CardAction>
+
+      {/* Second Card */}
+      <Card className="w-full max-w-sm p-4">
+        <CardHeader className="p-0 flex flex-col">
+          <CardDescription>Total Debt</CardDescription>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              ${totalDebt}
+            </CardTitle>
+            <CardAction>
+              <Badge
+                variant="outline"
+                className="inline-flex items-center gap-1"
+              >
+                +12.5%
+              </Badge>
+            </CardAction>
+          </div>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <TrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
-          </div>
-        </CardFooter>
-      </Card>
-      {/*  */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
-          </CardTitle>
-          <CardAction>
-            <Badge
-              variant={"outline"}
-              className={cn("inline-flex items-center gap-1")}
-            >
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <TrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
-          </div>
-        </CardFooter>
-      </Card>
-      {/*  */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Active Expenses</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ${totalActiveExpenses}
-          </CardTitle>
-          <CardAction>
-            <Badge
-              variant={"outline"}
-              className={cn("inline-flex items-center gap-1")}
-            >
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+
+        <CardFooter className="p-0 mt-2 flex flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Trending up this month <TrendingUp className="size-4" />
           </div>
@@ -137,6 +95,7 @@ export default function CardWrapper() {
     </>
   );
 }
+
 
 // export function Card({
 //   title,

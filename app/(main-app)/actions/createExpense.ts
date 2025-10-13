@@ -37,7 +37,6 @@ export const createExpense = actionClient
         selectedMemberIds,
       },
     }) => {
-      console.log("customShares", customShares);
       const session = await getServerSession(authOptions);
       if (!session?.user?.id) {
         redirect("/login");
