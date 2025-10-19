@@ -14,7 +14,7 @@ export default async function middleware(req: NextRequest) {
 
   if (isProtectedRoute && !token?.id)
     return NextResponse.redirect(new URL("/login", req.url));
-  
+
   if (isPublicRoute && token?.id)
     return NextResponse.redirect(new URL("/groups", req.url));
 

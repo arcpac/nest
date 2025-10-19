@@ -1,0 +1,86 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: nest-postgres
+    environment:
+      POSTGRES_USER: antoniocaballes
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: nest
+    ports:
+      - "5433:5432"   # host port -> container port
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  migrate-and-seed:
+    build: .
+    container_name: nest-migrate-seed
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://antoniocaballes:root@db:5432/nest
+    command: sh -c "
+      npx wait-port db:5432;
+      echo 'Running migrations...';
+      npm run db:push;
+      echo 'Seeding database...';
+      npm run db:seed;
+      echo 'Done.'"
+    restart: "no"
+
+volumes:
+  db-data:
+
+
+# services:
+#   db:
+#     image: postgres:15-alpine
+#     container_name: nest-postgres
+#     environment:
+#       POSTGRES_USER: antoniocaballes
+#       POSTGRES_PASSWORD: root
+#       POSTGRES_DB: nest
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - db-data:/var/lib/postgresql/data
+
+#   migrate:
+#     build: .
+#     container_name: nest-migrate
+#     depends_on:
+#       - db
+#     environment:
+#       POSTGRES_USER: antoniocaballes
+#       POSTGRES_PASSWORD: root
+#       POSTGRES_DB: nest
+#       DATABASE_URL: postgresql://antoniocaballes:root@db:5432/nest
+#     command: ["./wait-for-db.sh", "db", "npm", "run", "db:push"]
+#     restart: "no"
+
+#   seed:
+#     build: .
+#     container_name: nest-seed
+#     depends_on:
+#       - migrate
+#     environment:
+#       POSTGRES_USER: antoniocaballes
+#       POSTGRES_PASSWORD: root
+#       POSTGRES_DB: nest
+#       DATABASE_URL: postgresql://antoniocaballes:root@db:5432/nest
+#     command: ["./wait-for-db.sh", "db", "npm", "run", "db:seed"]
+#     restart: "no"
+
+#   web:
+#     build: .
+#     container_name: my-nest-app
+#     depends_on:
+#       - seed
+#     environment:
+#       DATABASE_URL: postgresql://antoniocaballes:root@db:5432/nest
+#     ports:
+#       - "3000:3000"
+
+# volumes:
+#   db-data:

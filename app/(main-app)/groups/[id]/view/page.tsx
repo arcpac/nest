@@ -6,11 +6,12 @@ import ExpenseWrapper from "./components/ExpenseWrapper";
 import { Skeleton } from "@/components/ui/skeleton";
 import CardWrapper from "@/app/(main-app)/components/Cards";
 import { TableSkeleton } from "@/app/(main-app)/components/Skeletons";
+import { authOptions } from "@/lib/auth";
 
 export default async function ViewPage(props: {
   params: Promise<{ id: string; query?: string; page?: string }>;
 }) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/login");
   }
