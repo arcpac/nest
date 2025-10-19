@@ -55,13 +55,14 @@ const ExpenseList = ({
     }
     setSelectedExpenses(newSelected);
   };
-console.log('visibleExpenses', visibleExpenses)
+
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="flex flex-row justify-between">
         <h2 className={`mb-4 text-xl md:text-2xl`}>Expenses</h2>
-        <div className="flex text-sm text-blue-500 m-4 rounded-full border gap-3">
+        <div className="flex text-sm text-blue-500 m-4 rounded-full border px-3 py-1 gap-3">
           <div className="cursor-pointer">Pay all</div>
+          <div className="cursor-pointer">Import expenses</div>
           <div>
             <Link href={`/groups/${groupId}/create-expense`} className="">
               Create expense
