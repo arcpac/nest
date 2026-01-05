@@ -130,7 +130,6 @@ export async function getGroupWithMembers(groupId: string) {
 
 export async function getGroupExpenses(groupId: string, userId: string) {
   try {
-    console.log("TRIGGERED [getGroupExpenses]");
     // Artificial delay to test Suspense fallbacks
     await new Promise((resolve) => setTimeout(resolve, 1500));
     // First get the member ID for the user in this group

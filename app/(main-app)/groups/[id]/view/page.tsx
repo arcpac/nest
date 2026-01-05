@@ -11,6 +11,7 @@ import { authOptions } from "@/lib/auth";
 export default async function ViewPage(props: {
   params: Promise<{ id: string; query?: string; page?: string }>;
 }) {
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/login");
@@ -21,6 +22,7 @@ export default async function ViewPage(props: {
 
   if (!result) return <></>;
   const { group, members } = result;
+  
   return (
     <div>
       <h1 className={`mb-4 text-xl md:text-2xl`}>{group.name}</h1>

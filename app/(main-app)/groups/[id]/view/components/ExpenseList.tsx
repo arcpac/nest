@@ -55,7 +55,7 @@ const ExpenseList = ({
     }
     setSelectedExpenses(newSelected);
   };
-console.log('visibleExpenses', visibleExpenses)
+
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="flex flex-row justify-between">

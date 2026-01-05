@@ -1,9 +1,6 @@
-
 import { inter } from "../ui/fonts";
 
-import {
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 
 export default async function MainAppLayout({
@@ -11,7 +8,6 @@ export default async function MainAppLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   return (
     <div className={`main-app-layout flex h-screen ${inter.className}`}>
       <SidebarProvider>

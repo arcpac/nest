@@ -196,7 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <div onClick={() => toggleSidebar()}>
                 <AppleIcon className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">Acme Inc. THIS IS</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
