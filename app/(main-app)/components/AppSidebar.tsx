@@ -16,21 +16,28 @@ import {
   Apple,
   AppleIcon,
   BarChart2Icon,
+  Bell,
   BookOpen,
   Bot,
   CirclePlus,
+  FileText,
   Frame,
+  HandCoins,
   LayoutDashboard,
   LayoutDashboardIcon,
   LifeBuoy,
   ListIcon,
   Map,
   PieChart,
+  Receipt,
   Send,
   Settings2,
   SquareTerminal,
+  Timer,
+  Upload,
   User,
   UserIcon,
+  UserPlus,
 } from "lucide-react";
 import { UserNav } from "./UserNav";
 import { ItemsWithDropdown } from "./ItemsWithDropdown";
@@ -43,10 +50,12 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
+
+  // Top-level quick nav (core screens)
   mainNav: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
     {
@@ -56,130 +65,107 @@ const data = {
     },
     {
       title: "Expenses",
-      url: "#",
+      url: "/expenses",
       icon: ListIcon,
     },
+
+    // Senior-signal additions
+    {
+      title: "Settle Up",
+      url: "/settlements",
+      icon: HandCoins, // or CreditCard
+    },
+    {
+      title: "Receipts",
+      url: "/receipts",
+      icon: Receipt,
+    },
+    {
+      title: "Activity",
+      url: "/activity",
+      icon: History, // audit trail / event log vibe
+    },
+
+    // Nice-to-have
     {
       title: "Analytics",
-      url: "#",
+      url: "/analytics",
       icon: BarChart2Icon,
     },
   ],
+
+  // Grouped sections (feature areas / settings)
   navWithChildren: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Imports",
+      url: "/imports",
+      icon: Upload,
       items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
+        { title: "Bank CSV Import", url: "/imports/bank-csv" },
+        { title: "Rules & Mapping", url: "/imports/rules" },
+        { title: "Import History", url: "/imports/history" },
       ],
     },
+
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
+      title: "Invites",
+      url: "/invites",
+      icon: UserPlus,
       items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        { title: "Invite Members", url: "/invites/new" },
+        { title: "Magic Links", url: "/invites/links" },
+        { title: "Pending Invites", url: "/invites/pending" },
       ],
     },
+
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
+      title: "Notifications",
+      url: "/notifications",
+      icon: Bell,
       items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
+        { title: "Preferences", url: "/notifications/preferences" },
+        { title: "Email Templates", url: "/notifications/email" },
+        { title: "Push (PWA)", url: "/notifications/push" },
+        { title: "Delivery Logs", url: "/notifications/logs" },
       ],
     },
+
+    {
+      title: "Automation",
+      url: "/automation",
+      icon: Timer, // or Repeat
+      items: [
+        { title: "Recurring Expenses", url: "/automation/recurring" },
+        { title: "Monthly Summaries", url: "/automation/summaries" },
+        { title: "Background Jobs", url: "/automation/jobs" },
+      ],
+    },
+
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: Settings2,
       items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
+        { title: "Profile", url: "/settings/profile" },
+        { title: "Household & Roles", url: "/settings/household" },
+        { title: "Billing / Plans", url: "/settings/billing" },
+        { title: "Data Export", url: "/settings/export" },
       ],
     },
   ],
+
   navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
+    { title: "Support", url: "/support", icon: LifeBuoy },
+    { title: "Feedback", url: "/feedback", icon: Send },
+    { title: "Docs", url: "/docs", icon: BookOpen },
+    { title: "Changelog", url: "/changelog", icon: FileText },
   ],
+
+  // Optional: keep or repurpose this section as “Quick Links”
   projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+    { name: "Templates", url: "/templates", icon: Frame },
+    { name: "Categories", url: "/categories", icon: PieChart },
+    { name: "Locations", url: "/locations", icon: Map },
   ],
 };
 
@@ -196,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <div onClick={() => toggleSidebar()}>
                 <AppleIcon className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc. THIS IS</span>
+                <span className="text-base font-semibold">Nest</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

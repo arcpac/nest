@@ -43,7 +43,7 @@ export function MainNav({
           <SidebarMenuItem key={item.title}>
             <Link href={"/groups"}>
               <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon />}
+                {/*  */}
                 <span>{item.title}</span>
               </SidebarMenuButton>
             </Link>

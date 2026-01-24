@@ -40,6 +40,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Nest App
 First, run the development server:
 
-```bash
-asdfsfd
-```
+## Upcoming features
+
+### 1. Receipt capture → OCR → auto expense draft
+**What:** Upload a receipt and automatically pre-fill expense details (amount, date, merchant).  
+**Approach:** Use an OCR provider (or start with “manual + smart suggestions” as an MVP).  
+**Senior signals:** Async processing pipeline, file storage, retries, parsing confidence scores.  
+**MVP scope:** Upload → background job extracts fields → user confirms → creates expense.
+
+### 2. Notifications (Email + Push)
+**What:** Notify members when they’re added, when an expense is created, and when balances change.  
+**Email provider:** Resend / SendGrid / similar.  
+**Push:** Web Push (PWA) for real-time notifications.  
+**Senior signals:** Event-driven design, notification preferences, batching/digests.  
+
+### 3. Invite to household via magic links
+**What:** Invite members via a secure token link to join a household.  
+**Senior signals:** Secure token design, expiry handling, replay protection.

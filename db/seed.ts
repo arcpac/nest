@@ -8,6 +8,7 @@ import {
   expenses,
   expense_shares,
   posts,
+  otpChallenges,
 } from "./schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
@@ -21,6 +22,7 @@ async function seed() {
   await db.execute(sql`DELETE FROM ${members}`);
   await db.execute(sql`DELETE FROM ${groups}`);
   await db.execute(sql`DELETE FROM ${users}`);
+  await db.execute(sql`DELETE FROM ${otpChallenges}`);
 
   async function generateRandomUsers(count: number) {
     const result = [];
@@ -137,8 +139,6 @@ async function seed() {
 
     const [member1, member2, member3] = seededMembers;
 
-
-
     // Create 10 expenses with mixed creators: admin (user1) and user2
     const possibleCreators = [user1.id, user2.id];
     const expenseValues = Array.from({ length: 10 }).map(() => ({
@@ -151,10 +151,7 @@ async function seed() {
       group_id: group1.id,
     }));
 
-    await db
-      .insert(expenses)
-      .values(expenseValues)
-      .returning();
+    await db.insert(expenses).values(expenseValues).returning();
   }
 
   await seedUsers();
