@@ -57,3 +57,23 @@ First, run the development server:
 ### 3. Invite to household via magic links
 **What:** Invite members via a secure token link to join a household.  
 **Senior signals:** Secure token design, expiry handling, replay protection.
+
+
+
+.env variables
+
+DATABASE_URL="postgresql://<asdf>:adsf@localhost:5432/nest"
+NEXTAUTH_SECRET="asdf"
+
+UPSTASH_REDIS_REST_URL="https:asdf"
+UPSTASH_REDIS_REST_TOKEN="NDAzODI"
+
+SMTP_HOST=sandbox.smtp.mailtrap.io
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=asdf
+SMTP_PASS=asdf
+SMTP_FROM="SplitNest <no-reply@domain.com>"
+
+OTP_SECRET=some-long-random-string
+
