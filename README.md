@@ -59,21 +59,37 @@ First, run the development server:
 **Senior signals:** Secure token design, expiry handling, replay protection.
 
 
+# SplitNest
 
-.env variables
+## Prerequisites
+- Node.js (LTS recommended)
+- PostgreSQL running locally (or a hosted Postgres instance)
+- (Optional) An SMTP provider for email/OTP delivery (e.g., Mailtrap for testing)
 
-DATABASE_URL="postgresql://<asdf>:adsf@localhost:5432/nest"
-NEXTAUTH_SECRET="asdf"
+---
 
-UPSTASH_REDIS_REST_URL="https:asdf"
-UPSTASH_REDIS_REST_TOKEN="NDAzODI"
+## Environment Variables
 
-SMTP_HOST=sandbox.smtp.mailtrap.io
+Create a `.env` file in the project root and add the following variables:
+
+```bash
+# Database
+DATABASE_URL="postgresql://<user>:<password>@localhost:5432/nest"
+
+# Auth
+NEXTAUTH_SECRET="your-random-secret"
+
+# Upstash Redis (Rate limiting)
+UPSTASH_REDIS_REST_URL="https://..."
+UPSTASH_REDIS_REST_TOKEN="..."
+
+# SMTP (Email)
+SMTP_HOST="sandbox.smtp.mailtrap.io"
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=asdf
-SMTP_PASS=asdf
+SMTP_USER="..."
+SMTP_PASS="..."
 SMTP_FROM="SplitNest <no-reply@domain.com>"
 
-OTP_SECRET=some-long-random-string
-
+# OTP
+OTP_SECRET="some-long-random-string"
