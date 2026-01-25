@@ -42,9 +42,6 @@ const ExpenseList = ({
   const handleSelectAll = (checked: boolean | "indeterminate") => {
     const isChecked = checked === true;
 
-    console.log("expenses: ", expenses);
-    const setExpenses = new Set(expenses.map((expense) => expense.id));
-    console.log("expenses new Set: ", setExpenses);
     if (isChecked) {
       setSelectedExpenses(new Set(expenses.map((expense) => expense.id)));
     } else {
@@ -68,7 +65,6 @@ const ExpenseList = ({
         <h2 className={`mb-4 text-xl md:text-2xl`}>Expenses</h2>
         <div className="flex items-center text-sm p-2 m-4 rounded-full border border-blue-200/70 gap-3">
           <button
-            type="button"
             disabled={payAllDisabled}
             className={`nest-button nest-button--outline ${
               payAllDisabled ? "cursor-not-allowed opacity-50" : ""

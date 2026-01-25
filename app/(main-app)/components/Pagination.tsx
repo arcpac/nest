@@ -107,9 +107,6 @@ function PaginationNumber({
     >
       {page}
     </button>
-    // <Link href={''} className={className}>
-    //   {page}
-    // </Link>
   );
 }
 

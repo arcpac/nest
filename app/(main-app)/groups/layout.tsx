@@ -1,23 +1,20 @@
 import { getUserId } from "@/lib/auth";
 import DataProvider from "@/app/DataProvider";
 import { getUserGroups } from "../actions/groups";
+import ModalProvider from "@/app/stores/ModalProvider";
+import ModalOutlet from "./components/modals/ModalOutlet";
+
 
 export default async function GroupsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userId = await getUserId();
-
-  const { userGroups: groups, totalDebt } = await getUserGroups(userId);
 
   return (
-    <DataProvider
-      initialCount={9}
-      initialGroups={groups}
-      initialExpenseData={{ totalDebt: totalDebt, totalActiveExpenses: 0 }}
-    >
+    <ModalProvider>
+      <ModalOutlet />
       {children}
-    </DataProvider>
+    </ModalProvider>
   );
 }

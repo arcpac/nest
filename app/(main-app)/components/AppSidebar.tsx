@@ -23,6 +23,7 @@ import {
   FileText,
   Frame,
   HandCoins,
+  History,
   LayoutDashboard,
   LayoutDashboardIcon,
   LifeBuoy,

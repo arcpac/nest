@@ -41,7 +41,7 @@ export function MainNav({
         </SidebarMenuItem>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <Link href={"/groups"}>
+            <Link href={item.url}>
               <SidebarMenuButton tooltip={item.title}>
                 {/*  */}
                 <span>{item.title}</span>

@@ -22,7 +22,7 @@ export default async function ViewPage(props: {
 
   if (!result) return <></>;
   const { group, members } = result;
-  
+
   return (
     <div>
       <h1 className={`mb-4 text-xl md:text-2xl`}>{group.name}</h1>
