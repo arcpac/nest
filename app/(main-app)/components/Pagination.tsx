@@ -97,7 +97,7 @@ function PaginationNumber({
       "text-gray-300": position === "middle",
     }
   );
-  console.log("position", page);
+
   return isActive || position === "middle" ? (
     <div className={className}>{page}</div>
   ) : (
@@ -107,9 +107,6 @@ function PaginationNumber({
     >
       {page}
     </button>
-    // <Link href={''} className={className}>
-    //   {page}
-    // </Link>
   );
 }
 

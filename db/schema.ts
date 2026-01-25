@@ -7,6 +7,7 @@ import {
   numeric,
   serial,
   unique,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -103,6 +104,31 @@ export const posts = pgTable("posts", {
     .defaultNow()
     .notNull(),
 });
+
+
+
+export const otpChallenges = pgTable("otpchallenges", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  email: text("email").notNull(),
+
+  // hashed OTP (never store the actual 6-digit code)
+  code_hash: text("code_hash").notNull(),
+
+  expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
+  used_at: timestamp("used_at", { withTimezone: true }),
+
+  attempts: integer("attempts").notNull().default(0),
+
+  // optional but useful
+  ip: text("ip"),
+  user_agent: text("user_agent"),
+
+  created_at: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 
 export const schema = {
   users,

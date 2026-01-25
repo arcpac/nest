@@ -11,7 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const GroupsView = () => {
   const groups = useDataStore((state) => state.groups);
-  // const totalDebt = useDataStore((state) => state.totalDebt);
+  const totalDebt = useDataStore((state) => state.totalDebt);
+
+  console.log('total debt: ', totalDebt)
   return (
     <div className="w-full">
       <div className="flex flex-row justify-start items-center mb-3">

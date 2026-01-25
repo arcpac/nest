@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const protectedRoutes = ["/groups"];
+const protectedRoutes = ["/groups", "/expenses"];
 const publicRoutes = ["/login"];
 //next-auth
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
+  const isProtectedRoute = protectedRoutes.some(
+    (route) => path === route || path.startsWith(`${route}/`)
+  );
+  const isPublicRoute = publicRoutes.some(
+    (route) => path === route || path.startsWith(`${route}/`)
+  );
 
   // Get the JWT token from next-auth
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

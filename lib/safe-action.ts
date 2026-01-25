@@ -1,11 +1,10 @@
-
 import { getServerSession } from "next-auth";
 import { createSafeActionClient } from "next-safe-action";
 
 export const actionClient = createSafeActionClient();
 
-export const protectedAction = createSafeActionClient()
-  .use(async ({ next }) => {
+export const protectedAction = createSafeActionClient().use(
+  async ({ next }) => {
     const session = await getServerSession();
 
     if (!session?.user) {
@@ -13,4 +12,5 @@ export const protectedAction = createSafeActionClient()
     }
 
     return next({ ctx: { session } });
-  });
+  }
+);

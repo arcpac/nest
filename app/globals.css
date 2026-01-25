@@ -118,3 +118,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .nest-button {
+    @apply cursor-pointer px-3 py-1.5 text-center rounded-full transition-colors;
+  }
+  .nest-button--outline {
+    @apply border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100;
+  }
+  .nest-button--primary {
+    @apply border border-blue-600 bg-blue-600 text-white hover:bg-blue-700;
+  }
+  .nest-button--clear {
+    @apply bg-neutral-100 hover:bg-neutral-200
+  }
+}

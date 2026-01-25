@@ -40,6 +40,56 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Nest App
 First, run the development server:
 
+## Upcoming features
+
+### 1. Receipt capture → OCR → auto expense draft
+**What:** Upload a receipt and automatically pre-fill expense details (amount, date, merchant).  
+**Approach:** Use an OCR provider (or start with “manual + smart suggestions” as an MVP).  
+**Senior signals:** Async processing pipeline, file storage, retries, parsing confidence scores.  
+**MVP scope:** Upload → background job extracts fields → user confirms → creates expense.
+
+### 2. Notifications (Email + Push)
+**What:** Notify members when they’re added, when an expense is created, and when balances change.  
+**Email provider:** Resend / SendGrid / similar.  
+**Push:** Web Push (PWA) for real-time notifications.  
+**Senior signals:** Event-driven design, notification preferences, batching/digests.  
+
+### 3. Invite to household via magic links
+**What:** Invite members via a secure token link to join a household.  
+**Senior signals:** Secure token design, expiry handling, replay protection.
+
+
+# SplitNest
+
+## Prerequisites
+- Node.js (LTS recommended)
+- PostgreSQL running locally (or a hosted Postgres instance)
+- (Optional) An SMTP provider for email/OTP delivery (e.g., Mailtrap for testing)
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root and add the following variables:
+
 ```bash
-asdfsfd
-```
+# Database
+DATABASE_URL="postgresql://<user>:<password>@localhost:5432/nest"
+
+# Auth
+NEXTAUTH_SECRET="your-random-secret"
+
+# Upstash Redis (Rate limiting)
+UPSTASH_REDIS_REST_URL="https://..."
+UPSTASH_REDIS_REST_TOKEN="..."
+
+# SMTP (Email)
+SMTP_HOST="sandbox.smtp.mailtrap.io"
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER="..."
+SMTP_PASS="..."
+SMTP_FROM="SplitNest <no-reply@domain.com>"
+
+# OTP
+OTP_SECRET="some-long-random-string"

@@ -17,7 +17,7 @@ export function StatusLabel({ isTrue, type }: StatusLabelProps) {
     },
     expenses: {
       true: { label: "Paid", variant: "default" as const },
-      false: { label: "Pending", variant: "outline" as const },
+      false: { label: "Unpaid", variant: "outline" as const },
     },
   };
 

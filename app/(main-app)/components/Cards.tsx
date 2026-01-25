@@ -30,9 +30,8 @@ const iconMap = {
 
 export default function CardWrapper() {
   const totalDebt = useDataStore((state) => state.totalDebt);
-  const totalActiveExpenses = useDataStore(
-    (state) => state.totalActiveExpenses
-  );
+  const totalActiveExpenses = useDataStore((state) => state.totalActiveExpenses);
+
 
   return (
     <>
@@ -63,11 +62,9 @@ export default function CardWrapper() {
           </div>
         </CardFooter>
       </Card>
-
-      {/* Second Card */}
       <Card className="w-full max-w-sm p-4">
         <CardHeader className="p-0 flex flex-col">
-          <CardDescription>Total Debt</CardDescription>
+          <CardDescription>Unpaid expense shares total</CardDescription>
           <div className="flex items-center gap-2">
             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
               ${totalDebt}
@@ -77,7 +74,7 @@ export default function CardWrapper() {
                 variant="outline"
                 className="inline-flex items-center gap-1"
               >
-                +12.5%
+                {totalActiveExpenses}
               </Badge>
             </CardAction>
           </div>
@@ -95,31 +92,3 @@ export default function CardWrapper() {
     </>
   );
 }
-
-
-// export function Card({
-//   title,
-//   value,
-//   type,
-// }: {
-//   title: string;
-//   value: number | string;
-//   type: "invoices" | "debtors" | "pending" | "collected";
-// }) {
-//   const Icon = iconMap[type];
-
-//   return (
-//     <div className="rounded-xl bg-gray-50 p-2 shadow-sm">
-//       <div className="flex p-4">
-//         {Icon ? <Icon className="h-5 w-5 text-gray-700" /> : null}
-//         <h3 className="ml-2 text-sm font-medium">{title}</h3>
-//       </div>
-//       <p
-//         className={`${lusitana.className}
-//             truncate rounded-xl bg-white px-4 py-8 text-center text-2xl`}
-//       >
-//         {value}
-//       </p>
-//     </div>
-//   );
-// }
