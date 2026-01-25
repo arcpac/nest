@@ -355,7 +355,6 @@ export function LoginForm() {
                   return;
                 }
                 setFieldErrors(undefined);
-                console.log("EMAIL IS: ", email);
                 {
                   loginWithPassword
                     ? handleLoginUser({ email, password })

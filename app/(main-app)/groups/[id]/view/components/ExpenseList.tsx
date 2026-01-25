@@ -27,7 +27,6 @@ const ExpenseList = ({
     new Set()
   );
 
-  // Check if all expenses are selected
   const allSelected = useMemo(() => {
     return expenses.length > 0 && selectedExpenses.size === expenses.length;
   }, [expenses.length, selectedExpenses.size]);
@@ -61,25 +60,29 @@ const ExpenseList = ({
 
   return (
     <div className="flex w-full flex-col md:col-span-4">
-      <div className="flex flex-row justify-between">
-        <h2 className={`mb-4 text-xl md:text-2xl`}>Expenses</h2>
-        <div className="flex items-center text-sm p-2 m-4 rounded-full border border-blue-200/70 gap-3">
-          <button
-            disabled={payAllDisabled}
-            className={`nest-button nest-button--outline ${
-              payAllDisabled ? "cursor-not-allowed opacity-50" : ""
-            }`}
-          >
-            Pay all
-          </button>
-          <div className="nest-button nest-button--outline">
-            <Link href={`/groups/${groupId}/create-expense`}>
-              Create expense
-            </Link>
+      <div className="rounded-xl bg-gray-50 p-2">
+
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2 p-2 md:p-4">
+            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Unpaid expenses
+            </span>
+          </div>
+          <div className="flex items-center text-sm p-2 m-4 rounded-full border border-blue-200/70 gap-3">
+            <button
+              disabled={payAllDisabled}
+              className={`nest-button nest-button--outline ${payAllDisabled ? "cursor-not-allowed opacity-50" : ""
+                }`}
+            >
+              Pay all
+            </button>
+            <div className="nest-button nest-button--outline">
+              <Link href={`/groups/${groupId}/create-expense`}>
+                Create expense
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="rounded-xl bg-gray-50 p-4">
         <div className="bg-white rounded-lg">
           <div className="w-full overflow-x-auto">
             <table className="w-full min-w-[900px] md:min-w-0">
@@ -91,8 +94,8 @@ const ExpenseList = ({
                         allSelected
                           ? true
                           : someSelected
-                          ? "indeterminate"
-                          : false
+                            ? "indeterminate"
+                            : false
                       }
                       onCheckedChange={handleSelectAll}
                       className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"

@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CardWrapper from "@/app/(main-app)/components/Cards";
 import { TableSkeleton } from "@/app/(main-app)/components/Skeletons";
 import { authOptions } from "@/lib/auth";
+import GroupMemberList from "./components/GroupMemberList";
 
 export default async function ViewPage(props: {
   params: Promise<{ id: string; query?: string; page?: string }>;
@@ -31,7 +32,7 @@ export default async function ViewPage(props: {
           <CardWrapper />
         </Suspense>
       </div>
-      <div className="mt-6 grid grid-cols-1 gap-6">
+      <div className="mt-6 grid grid-cols-6 gap-6">
         <Suspense fallback={<TableSkeleton />}>
           <ExpenseWrapper
             groupId={group.id}
@@ -39,6 +40,10 @@ export default async function ViewPage(props: {
             members={members}
           />
         </Suspense>
+        <div className="col-span-2">
+          <GroupMemberList groupMembers={members} />
+        </div>
+
       </div>
     </div>
   );

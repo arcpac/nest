@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { and, eq, sql } from "drizzle-orm";
 
 export async function getTotalUnpaidShares(userId: string) {
+  console.log('TRIGGER: getTotalUnpaidShares')
   const [row] = await db
     .select({
       totalDebt: sql<string>`COALESCE(SUM(${expense_shares.share}), 0)`.as("totalDebt"),
@@ -16,6 +17,20 @@ export async function getTotalUnpaidShares(userId: string) {
     totalDebt: row?.totalDebt ?? "0",
     unpaidCount: Number(row?.unpaidCount ?? 0),
   };
+}
+
+export async function getGroupMembers(groupId: string) {
+  const groupMembers = await db
+    .select({
+      id: members.id,
+      groupName: groups.name,
+      email: members.email
+    })
+    .from(members)
+    .innerJoin(groups, eq(groups.id, members.group_id))
+    .where(eq(groups.id, groupId))
+
+  return groupMembers
 }
 
 export async function getUserGroups(userId: string) {
@@ -115,7 +130,6 @@ export async function getGroupExpenses(groupId: string, userId: string) {
       )
       .where(and(eq(expenses.group_id, groupId)))
 
-    console.log('groupExpenses', groupExpenses)
     // Calculate yourShare for each expense and total group debt
     let totalGroupDebt = 0;
 

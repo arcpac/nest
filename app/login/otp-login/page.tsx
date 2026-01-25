@@ -71,7 +71,6 @@ export default function OtpLoginPage() {
       });
 
       const data = (await res.json().catch(() => ({}))) as any;
-      console.log("response data: ", data);
       if (!res.ok) {
         const apiErr = data as ApiError;
         if (apiErr.retryAfterMs) {
@@ -96,43 +95,6 @@ export default function OtpLoginPage() {
       setIsRequesting(false);
     }
   }
-
-  // OPTION 1
-  // async function verifyOtp() {
-  //   setError(null);
-  //   setIsVerifying(true);
-
-  //   try {
-  //     const res = await fetch("/api/auth/otp/verify", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         email,
-  //         challengeId,
-  //         code,
-  //       }),
-  //     });
-
-  //     const data = (await res.json().catch(() => ({}))) as any;
-
-  //     if (!res.ok) {
-  //       const apiErr = data as ApiError;
-  //       if (apiErr.retryAfterMs) {
-  //         setCooldownUntil(Date.now() + apiErr.retryAfterMs);
-  //       }
-  //       setError(apiErr.serverError || apiErr.error || "Invalid code.");
-  //       return;
-  //     }
-
-  //     // success
-  //     router.push("/"); // or your dashboard route
-  //     router.refresh();
-  //   } catch {
-  //     setError("Network error. Please try again.");
-  //   } finally {
-  //     setIsVerifying(false);
-  //   }
-  // }
 
   function onEmailSubmit(e: FormEvent) {
     e.preventDefault();
@@ -245,8 +207,8 @@ export default function OtpLoginPage() {
               {isRequesting
                 ? "Sending code…"
                 : isCooldown
-                ? `Wait ${formatSeconds(cooldownMs)}`
-                : "Send code"}
+                  ? `Wait ${formatSeconds(cooldownMs)}`
+                  : "Send code"}
             </button>
 
             <div className="text-center text-xs text-neutral-500 dark:text-neutral-400">
@@ -302,8 +264,8 @@ export default function OtpLoginPage() {
               {isRequesting
                 ? "Resending…"
                 : isCooldown
-                ? `Resend in ${formatSeconds(cooldownMs)}`
-                : "Resend code"}
+                  ? `Resend in ${formatSeconds(cooldownMs)}`
+                  : "Resend code"}
             </button>
           </form>
         )}
