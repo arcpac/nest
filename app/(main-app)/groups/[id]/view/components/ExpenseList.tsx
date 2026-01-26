@@ -1,31 +1,24 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import ExpenseItem from "./ExpenseItem";
-import { Expenses, Member } from "@/app/types";
+import { Expenses, GroupExpenseShare, Member } from "@/app/types";
 import { Checkbox } from "@/components/ui/checkbox";
-import Pagination from "@/app/(main-app)/components/Pagination";
+import { useModalStore } from "@/app/stores/ModalProvider";
 
 const ExpenseList = ({
   expenses,
   members,
   groupId,
 }: {
-  expenses: Expenses;
+  expenses: GroupExpenseShare[];
   members: Member[];
   groupId: string;
 }) => {
-  const [currentPage, setPage] = useState(1);
-  const pageSize = 5;
-  const visibleExpenses = expenses.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
   const [selectedExpenses, setSelectedExpenses] = useState<Set<string>>(
     new Set()
   );
+  const openModal = useModalStore((modalStore) => modalStore.open)
 
   const allSelected = useMemo(() => {
     return expenses.length > 0 && selectedExpenses.size === expenses.length;
@@ -36,7 +29,7 @@ const ExpenseList = ({
     return selectedExpenses.size > 0 && selectedExpenses.size < expenses.length;
   }, [selectedExpenses.size, expenses.length]);
 
-  const payAllDisabled = !someSelected && !allSelected;
+  const disabledButton = !someSelected && !allSelected;
 
   const handleSelectAll = (checked: boolean | "indeterminate") => {
     const isChecked = checked === true;
@@ -57,7 +50,7 @@ const ExpenseList = ({
     }
     setSelectedExpenses(newSelected);
   };
-
+  console.log('Expenses in ExpenseList: ', expenses)
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="rounded-xl bg-gray-50 p-2">
@@ -70,17 +63,30 @@ const ExpenseList = ({
           </div>
           <div className="flex items-center text-sm p-2 m-4 rounded-full border border-blue-200/70 gap-3">
             <button
-              disabled={payAllDisabled}
-              className={`nest-button nest-button--outline ${payAllDisabled ? "cursor-not-allowed opacity-50" : ""
+              disabled={disabledButton}
+              className={`nest-button nest-button--outline ${disabledButton ? "cursor-not-allowed opacity-50" : ""
                 }`}
             >
               Pay all
             </button>
-            <div className="nest-button nest-button--outline">
-              <Link href={`/groups/${groupId}/create-expense`}>
-                Create expense
-              </Link>
+            <div className="nest-button nest-button--outline cursor-pointer"
+              onClick={() => openModal("add-expense", { members: members })}>
+              Create expense
             </div>
+            {!disabledButton &&
+              <button
+                disabled={disabledButton}
+                className={`nest-button nest-button--danger ${disabledButton ? "cursor-not-allowed opacity-50" : ""
+                  }`}
+                onClick={() =>
+                  openModal("delete-expenses", {
+                    expenseIds: Array.from(selectedExpenses),
+                  })
+                }
+              >
+                Delete expenses
+              </button>
+            }
           </div>
         </div>
         <div className="bg-white rounded-lg">
@@ -122,7 +128,7 @@ const ExpenseList = ({
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {visibleExpenses.map((expense, i) => (
+                {expenses.map((expense, i) => (
                   <ExpenseItem
                     key={i}
                     expense={expense}
@@ -137,9 +143,6 @@ const ExpenseList = ({
             </table>
           </div>
         </div>
-      </div>
-      <div className="flex justify-center mt-5">
-        <Pagination totalPages={5} setPage={setPage} />
       </div>
     </div>
   );

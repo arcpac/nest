@@ -69,27 +69,31 @@ export const loginUser = publicAction
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput: { email, password } }) => {
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
-
-    const user = existingUser[0];
+    const normalizedEmail = normalizeEmail(email);
 
     const invalid = {
       success: false as const,
       fieldErrors: { unauthorised: "Invalid email or password" },
     };
+
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, normalizedEmail))
+      .limit(1)
+      .then((res) => res[0]);
+
     if (!user) return invalid;
+
+    // ✅ if OTP users have no password set
+    if (!user.password) return invalid;
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) return invalid;
 
-    return {
-      success: true,
-    };
+    return { success: true };
   });
+
 
 export const loginOtp = publicAction
   .metadata({ actionName: "loginOtp" })

@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { loginOtp, loginUser, resendCode } from "@/lib/login";
 import { signIn } from "next-auth/react";
@@ -15,10 +15,10 @@ import { ResendOtpButton } from "./components/ResendCodeButton";
 
 type FormErrors =
   | {
-      email?: string[] | undefined;
-      password?: string[] | undefined;
-      unauthorised?: string[] | undefined;
-    }
+    email?: string[] | undefined;
+    password?: string[] | undefined;
+    unauthorised?: string[] | undefined;
+  }
   | undefined;
 
 function maskEmail(email: string) {
@@ -31,6 +31,10 @@ function maskEmail(email: string) {
   const safeDomain =
     d0.length <= 2 ? `${d0[0]}*` : `${d0[0]}***${d0[d0.length - 1]}`;
   return `${safeName}@${safeDomain}.${parts.slice(1).join(".") || "com"}`;
+}
+
+function normalizeLoginEmail(value: string) {
+  return value.trim().toLowerCase();
 }
 
 export function LoginForm() {
@@ -53,6 +57,7 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const submittedEmailRef = useRef<string | null>(null);
   const cooldownMs = cooldownUntil ? Math.max(0, cooldownUntil - now) : 0;
   const isCooldown = cooldownMs > 0;
   const canVerify = code.trim().length === 6 && /^\d{6}$/.test(code);
@@ -82,13 +87,14 @@ export function LoginForm() {
   }, [cooldownUntil]);
 
   const { execute: handleLoginUser } = useAction(loginUser, {
-    onSuccess: async ({}) => {
+    onSuccess: async ({ }) => {
+      const normalizedEmail =
+        submittedEmailRef.current ?? normalizeLoginEmail(email);
       const res = await signIn("credentials", {
-        email,
+        email: normalizedEmail,
         password,
         redirect: false,
       });
-
       if (res?.ok) {
         router.push("/groups");
       } else {
@@ -342,8 +348,9 @@ export function LoginForm() {
               className="w-full mt-6"
               onClick={() => {
                 const localError: FormErrors = {};
+                const normalizedEmail = normalizeLoginEmail(email);
 
-                if (!email.trim()) {
+                if (!normalizedEmail) {
                   localError.email = ["Email is required"];
                 }
                 if (loginWithPassword && !password.trim()) {
@@ -354,11 +361,15 @@ export function LoginForm() {
                   setFieldErrors(localError);
                   return;
                 }
+                submittedEmailRef.current = normalizedEmail;
+                if (normalizedEmail !== email) {
+                  setEmail(normalizedEmail);
+                }
                 setFieldErrors(undefined);
                 {
                   loginWithPassword
-                    ? handleLoginUser({ email, password })
-                    : handleLoginOtp({ email });
+                    ? handleLoginUser({ email: normalizedEmail, password })
+                    : handleLoginOtp({ email: normalizedEmail });
                 }
               }}
             >

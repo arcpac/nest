@@ -38,7 +38,7 @@ async function seed() {
       id: randomUUID(),
       username: faker.internet.username(),
       role: "user",
-      email: faker.internet.email(),
+      email: faker.internet.exampleEmail({ allowSpecialCharacters: false }).toLowerCase(),
       password: passwordHash,
     })),
   ];

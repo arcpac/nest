@@ -1,9 +1,8 @@
 import { expense_shares, expenses, groups, members, users } from "@/db/schema";
 import { db } from "@/db";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 
 export async function getTotalUnpaidShares(userId: string) {
-  console.log('TRIGGER: getTotalUnpaidShares')
   const [row] = await db
     .select({
       totalDebt: sql<string>`COALESCE(SUM(${expense_shares.share}), 0)`.as("totalDebt"),
@@ -84,9 +83,7 @@ export async function getGroupWithMembers(groupId: string) {
 
 export async function getGroupExpenses(groupId: string, userId: string) {
   try {
-    // Artificial delay to test Suspense fallbacks
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    // First get the member ID for the user in this group
 
     const member = await db
       .select({ memberId: members.id })
@@ -99,14 +96,6 @@ export async function getGroupExpenses(groupId: string, userId: string) {
       return { expenses: [], totalGroupDebt: "0.00" };
     }
 
-    // Get total member count for equal split calculation
-    const memberCount = await db
-      .select({ count: members.id })
-      .from(members)
-      .where(eq(members.group_id, groupId))
-      .then((res) => res.length);
-
-    // Get all expenses for the group with the user's share amount calculated
     const groupExpenses = await db
       .select({
         id: expenses.id,
@@ -120,35 +109,43 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         isPaid: expense_shares.paid,
       })
       .from(expenses)
-      .innerJoin(
+      .leftJoin(
         expense_shares,
         and(
           eq(expense_shares.expense_id, expenses.id),
-          eq(expense_shares.member_id, member.memberId),
-          eq(expense_shares.paid, false),
+          eq(expense_shares.member_id, member.memberId)
         )
       )
-      .where(and(eq(expenses.group_id, groupId)))
+      .where(
+        and(
+          eq(expenses.group_id, groupId),
+          or(
+            eq(expenses.created_by, userId),
+            and(isNotNull(expense_shares.member_id), eq(expense_shares.paid, false))
+          )
+        )
+      )
 
-    // Calculate yourShare for each expense and total group debt
-    let totalGroupDebt = 0;
 
-    const expensesWithShare = groupExpenses.map((expense) => {
-      let yourShare: string;
+    const expenseIds = groupExpenses.map((expense) => expense.id);
+    const expenseMemberIds = expenseIds.length
+      ? await db
+          .select({
+            expenseId: expense_shares.expense_id,
+            memberId: expense_shares.member_id,
+          })
+          .from(expense_shares)
+          .where(inArray(expense_shares.expense_id, expenseIds))
+      : [];
 
-      if (expense.isEqual) {
-        const amount = parseFloat(expense.amount);
-        const equalShare = amount / memberCount;
-        yourShare = equalShare.toFixed(2);
-        totalGroupDebt += equalShare;
-      } else {
-        const shareAmount = parseFloat(expense.share || "0.00");
-        yourShare = shareAmount.toFixed(2);
-        totalGroupDebt += shareAmount;
-      }
+    const memberIdsByExpense = expenseMemberIds.reduce((acc, share) => {
+      const list = acc.get(share.expenseId) ?? [];
+      list.push(share.memberId);
+      acc.set(share.expenseId, list);
+      return acc;
+    }, new Map<string, string[]>());
 
-      const isPaid = expense.isPaid ?? false;
-
+    const expensesClean = groupExpenses.map((expense) => {
       return {
         id: expense.id,
         title: expense.title,
@@ -157,14 +154,14 @@ export async function getGroupExpenses(groupId: string, userId: string) {
         isEqual: expense.isEqual,
         created_by: expense.created_by,
         createdAt: expense.createdAt,
-        yourShare,
-        isPaid,
+        shareAmount: expense.share,
+        isPaid: expense.isPaid ?? false,
+        memberIds: memberIdsByExpense.get(expense.id) ?? [],
       };
     });
 
     return {
-      expenses: expensesWithShare,
-      totalGroupDebt: totalGroupDebt.toFixed(2),
+      expenses: expensesClean,
     };
   } catch (error) {
     console.error("Error fetching group expenses:", error);

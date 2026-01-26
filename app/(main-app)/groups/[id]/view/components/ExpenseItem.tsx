@@ -4,9 +4,10 @@ import React, { useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   HandCoins,
+  Pencil,
 } from "lucide-react";
 
-import { Expense, Members } from "@/app/types";
+import { GroupExpenseShare, Members } from "@/app/types";
 import { StatusLabel } from "../../../components/Status";
 import { useModalStore } from "@/app/stores/ModalProvider";
 
@@ -16,7 +17,7 @@ const ExpenseItem = ({
   isSelected,
   onSelect,
 }: {
-  expense: Expense;
+  expense: GroupExpenseShare;
   members: Members;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
@@ -25,16 +26,10 @@ const ExpenseItem = ({
     () => members.find((mm) => mm.user_id === expense.created_by),
     [members]
   );
-
   // Payment dialog state
   const [paymentType, setPaymentType] = useState<"full" | "partial">("full");
   const [partialAmount, setPartialAmount] = useState<string>("0.00");
-  const [isOpen, setIsOpen] = useState(false);
   const openModal = useModalStore((modalStore) => modalStore.open)
-
-
-  const totalShare = parseFloat(expense.yourShare);
-  const currentPartialAmount = parseFloat(partialAmount);
 
   return (
     <tr className="hover:bg-blue-50">
@@ -85,9 +80,9 @@ const ExpenseItem = ({
       </td>
       <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
         <div className="flex flex-col items-end gap-1">
-          <span>${expense.yourShare}</span>
+          <span> {expense.shareAmount === null ? 'None' : expense.shareAmount}</span>
           <span className="text-xs text-gray-500">
-            Your share: ${expense.amount}
+            ${expense.amount}
           </span>
         </div>
       </td>
@@ -96,8 +91,32 @@ const ExpenseItem = ({
       </td>
       <td className="whitespace-nowrap py-3 pr-3 hidden sm:table-cell">
         <div className="flex justify-end gap-3">
-          <div className="inline-flex items-center p-2 rounded hover:bg-gray-100 cursor-pointer"
-            onClick={() => openModal("pay-expense", { members: members, expenseId: expense.id })}
+          <div
+            className="inline-flex items-center p-2 rounded hover:bg-white cursor-pointer"
+            onClick={() =>
+              // edit expense open modal
+              openModal("edit-expense", {
+                expense: {
+                  members,
+                  expenseId: expense.id,
+                  expenseTitle: expense.title,
+                  amount: expense.amount,
+                  description: expense.description,
+                  shareAmount: expense.shareAmount,
+                  selectedMemberIds: expense.memberIds,
+                },
+              })
+            }
+          >
+            <Pencil className="w-5 h-5 text-gray-600" />
+          </div>
+          <div
+            className="inline-flex items-center p-2 rounded hover:bg-white cursor-pointer"
+            onClick={() =>
+              openModal("pay-expense", {
+                expense: { members, expenseId: expense.id, expenseTitle: expense.title, shareAmount: expense.shareAmount },
+              })
+            }
           >
             <HandCoins className="w-5 h-5 text-gray-600" />
           </div>

@@ -18,13 +18,11 @@ import {
   BarChart2Icon,
   Bell,
   BookOpen,
-  Bot,
-  CirclePlus,
+
   FileText,
   Frame,
   HandCoins,
   History,
-  LayoutDashboard,
   LayoutDashboardIcon,
   LifeBuoy,
   ListIcon,
@@ -33,17 +31,15 @@ import {
   Receipt,
   Send,
   Settings2,
-  SquareTerminal,
   Timer,
   Upload,
-  User,
-  UserIcon,
   UserPlus,
 } from "lucide-react";
 import { UserNav } from "./UserNav";
 import { ItemsWithDropdown } from "./ItemsWithDropdown";
 import { NavWithChildren } from "./NavWithChildren";
 import MainNav from "./MainNav";
+import { useDataStore } from "@/app/DataProvider";
 
 const data = {
   user: {
@@ -172,6 +168,8 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { toggleSidebar } = useSidebar();
+  const user = useDataStore((s) => s.sessionUser);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -183,7 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <div onClick={() => toggleSidebar()}>
                 <AppleIcon className="!size-5" />
-                <span className="text-base font-semibold">Nest</span>
+                <span className="text-base font-semibold">{user?.name}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
