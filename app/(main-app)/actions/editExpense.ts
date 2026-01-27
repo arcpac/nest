@@ -32,14 +32,23 @@ export const editExpense = protectedAction
           id: expenses.id,
           isEqual: expenses.isEqual,
           groupId: expenses.group_id,
+          userId: expenses.created_by
         })
         .from(expenses)
-        .where(and(eq(expenses.id, expenseId), eq(expenses.created_by, userID)));
+        .where(and(eq(expenses.id, expenseId)));
+      console.log('EXISTING EXPENSE: ', existingExpense)
 
       if (!existingExpense) {
         return {
           isSuccess: false,
           message: "Expense not found",
+        };
+      }
+
+      if (existingExpense.userId !== userID) {
+        return {
+          isSuccess: false,
+          message: "Unable to edit expense. Ask the owner.",
         };
       }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import PayExpenseModal from "./PaymentModal";
+import PayExpenseModal from "./PayExpenseModal";
 import CreateExpenseModal from "./CreateExpenseModal";
 import DeleteExpensesModal from "./DeleteExpensesModal";
 import EditExpenseModal from "./EditExpenseModal";

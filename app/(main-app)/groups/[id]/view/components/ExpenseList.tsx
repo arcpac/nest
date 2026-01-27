@@ -66,6 +66,7 @@ const ExpenseList = ({
               disabled={disabledButton}
               className={`nest-button nest-button--outline ${disabledButton ? "cursor-not-allowed opacity-50" : ""
                 }`}
+              onClick={() => openModal('pay-expense', { selectedExpenses: selectedExpenses })}
             >
               Pay all
             </button>

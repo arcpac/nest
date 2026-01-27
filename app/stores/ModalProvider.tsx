@@ -8,11 +8,12 @@ import { Member } from "../types";
 type ModalType = "pay-expense" | "add-expense" | "edit-expense" | "delete-expenses" | null;
 
 export type PayExpensePayload = {
-    expense: {
+    selectedExpenses?: Set<string> | string[];
+    expense?: {
         expenseId: string;
         expenseTitle: string;
-        members: Member[];
-        shareAmount: string | null
+        shareAmount?: string | null;
+        members?: Member[];
     };
 };
 export type AddExpensePayload = {

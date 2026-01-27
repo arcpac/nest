@@ -1,12 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { CSSProperties, FunctionComponent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/button";
-import Select, { ClearIndicatorProps, MultiValue } from "react-select";
-import makeAnimated from "react-select/animated";
-import { CSSObject } from "@emotion/serialize";
+
 import {
     Dialog,
     DialogContent,
@@ -18,46 +16,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EditExpensePayload, useModalStore } from "@/app/stores/ModalProvider";
-import { Member } from "@/app/types";
 import { useAction } from "next-safe-action/hooks";
 import { editExpense } from "@/app/(main-app)/actions/editExpense";
 import { useRouter } from "next/navigation";
+import SelectField, { MemberOption } from "./SelectField";
 
-const CustomClearText: FunctionComponent = () => <>clear all</>;
-
-type MemberOption = {
-    value: string;
-    label: string;
-    member: Member;
-};
-
-const ClearIndicator = (props: ClearIndicatorProps<MemberOption, true>) => {
-    const {
-        children = <CustomClearText />,
-        getStyles,
-        innerProps: { ref, ...restInnerProps },
-    } = props;
-    return (
-        <div
-            {...restInnerProps}
-            ref={ref}
-            style={getStyles("clearIndicator", props) as CSSProperties}
-        >
-            <div style={{ padding: "0px 5px" }}>{children}</div>
-        </div>
-    );
-};
-
-const ClearIndicatorStyles = (
-    base: CSSObject,
-    state: ClearIndicatorProps<MemberOption>
-): CSSObject => ({
-    ...base,
-    cursor: "pointer",
-    color: state.isFocused ? "blue" : "black",
-});
-
-const animatedComponents = makeAnimated();
 
 export default function EditExpenseModal() {
     const router = useRouter();
@@ -70,7 +33,6 @@ export default function EditExpenseModal() {
             close: s.close,
         }))
     );
-    console.log('EditExpenseModal data', data)
 
     const open = isOpen && type === "edit-expense";
     const expense = data?.expense;
@@ -81,22 +43,8 @@ export default function EditExpenseModal() {
     const [description, setDescription] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
-    const memberOptions: MemberOption[] = (members ?? []).map((member) => {
-        const name = `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim();
-        return {
-            value: member.id,
-            label: name,
-            member,
-        };
-    });
-
-    const selectedOptions: MemberOption[] = React.useMemo(() => {
-        if (!expense?.selectedMemberIds?.length) return [];
-
-        const selectedSet = new Set(expense.selectedMemberIds);
-        return memberOptions.filter((opt) => selectedSet.has(opt.value));
-    }, [expense?.selectedMemberIds, memberOptions]);
 
     const canSubmit =
         title.trim().length > 0 &&
@@ -110,9 +58,9 @@ export default function EditExpenseModal() {
         setTitle(expense?.expenseTitle ?? "");
         setAmount(expense?.amount ?? "");
         setDescription(expense?.description ?? "");
-        setSelectedMembers(selectedOptions);
         setIsSubmitting(false);
-    }, [open, expense?.expenseId, selectedOptions]);
+        setError(null);
+    }, [open, expense?.expenseId]);
 
     const { execute: editExpenseAction } = useAction(editExpense, {
         onSuccess: ({ data }) => {
@@ -120,9 +68,12 @@ export default function EditExpenseModal() {
             if (data?.isSuccess) {
                 close();
                 router.refresh();
+                return;
             }
+            setError(data?.message ?? "Failed to update expense");
         },
         onError: () => {
+            debugger;
             setIsSubmitting(false);
         },
     });
@@ -132,6 +83,7 @@ export default function EditExpenseModal() {
         const parsedAmount = Number(amount);
         if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) return;
         setIsSubmitting(true);
+        setError(null);
 
         const selectedMemberIds = selectedMembers.length
             ? selectedMembers.map((member) => member.value)
@@ -155,6 +107,11 @@ export default function EditExpenseModal() {
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">
+                    {error ? (
+                        <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                            {error}
+                        </div>
+                    ) : null}
                     <div className="space-y-2">
                         <Label htmlFor="expense-title" className="text-sm font-medium">
                             Title
@@ -183,16 +140,12 @@ export default function EditExpenseModal() {
                     </div>
 
                     <div className="space-y-2">
-                        <Select<MemberOption, true>
-                            isMulti
-                            closeMenuOnSelect={false}
-                            components={{ ClearIndicator, ...animatedComponents }}
-                            styles={{ clearIndicator: ClearIndicatorStyles }}
-                            options={memberOptions}
-                            value={selectedMembers} // ✅ controlled
-                            onChange={(value: MultiValue<MemberOption>) =>
-                                setSelectedMembers(value as MemberOption[])
-                            }
+                        <SelectField
+                            members={members}
+                            selectedMemberIds={expense?.selectedMemberIds}
+                            isOpen={open}
+                            selectedMembers={selectedMembers}
+                            setSelectedMembers={setSelectedMembers}
                         />
                     </div>
 
