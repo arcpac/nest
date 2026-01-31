@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
         );
         if (!isValid) return null;
 
-        return { id: user.id, name: user.username, email: user.email };
+        return { id: user.id, username: user.username, email: user.email };
       },
     }),
   ],
@@ -57,9 +57,12 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-// sdfdsf
-export async function getSession() {
-  return await getServerSession(authOptions);
+
+
+interface User {
+  id: string;
+  name?: string | null;
+  email?: string | null;
 }
 
 export async function getUserId(): Promise<string> {
@@ -69,3 +72,12 @@ export async function getUserId(): Promise<string> {
   }
   return session.user.id;
 }
+
+export async function getUser(): Promise<User> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    redirect("/login");
+  }
+  return session.user;
+}
+

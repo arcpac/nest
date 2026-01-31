@@ -46,19 +46,18 @@ export default function PaymentModal() {
     const open = isOpen && type === "pay-expense";
     const expense = data?.expense;
 
-    const totalShare = toNumber(expense?.yourShare ?? 0);
+    const totalShare = toNumber(expense?.shareAmount ?? 0);
 
     const [paymentType, setPaymentType] = useState<PaymentType>("full");
     const [partialAmount, setPartialAmount] = useState<string>("0.00");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Reset form when opened / expense changes
     useEffect(() => {
         if (!open) return;
         setPaymentType("full");
         setPartialAmount("0.00");
         setIsSubmitting(false);
-    }, [open, expense?.id]);
+    }, [open, expense?.expenseId]);
 
     const currentPartialAmount = clamp(toNumber(partialAmount), 0, totalShare);
 
@@ -79,12 +78,12 @@ export default function PaymentModal() {
         paymentType === "partial" ? round2(totalShare - currentPartialAmount) : 0;
 
     const canSubmit =
-        !!expense?.id &&
+        !!expense?.expenseId &&
         !isSubmitting &&
         (paymentType === "full" ? totalShare > 0 : currentPartialAmount > 0);
 
     const handlePaymentSubmit = async () => {
-        if (!expense?.id) return;
+        if (!expense?.expenseId) return;
 
     };
 
@@ -96,7 +95,7 @@ export default function PaymentModal() {
                     <DialogDescription>
                         Make a payment for{" "}
                         <span className="font-medium">
-                            {expense?.title ?? "this expense"}
+                            {expense?.expenseTitle ?? "this expense"}
                         </span>
                     </DialogDescription>
                 </DialogHeader>

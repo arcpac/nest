@@ -4,11 +4,22 @@ import { PropsWithChildren, useContext, useState, createContext } from "react";
 import { createStore, StoreApi, useStore } from "zustand";
 import { Group } from "./types";
 
+type SessionUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+};
+
+
 type DataStore = {
   count: number;
   groups: Group[];
   totalDebt: string;
   totalActiveExpenses: number;
+
+  sessionUser: SessionUser | null;
+  setSessionUser: (u: SessionUser | null) => void;
+
   add: () => void;
 };
 
@@ -21,6 +32,7 @@ type DataProviderProps = PropsWithChildren<{
     totalDebt: string;
     totalActiveExpenses: number;
   };
+  initialSessionUser: SessionUser | null;
 }>;
 
 export default function DataProvider({
@@ -28,6 +40,7 @@ export default function DataProvider({
   initialCount,
   initialGroups,
   initialExpenseData,
+  initialSessionUser
 }: DataProviderProps) {
   const [store] = useState(() =>
     createStore<DataStore>((set) => ({
@@ -35,6 +48,10 @@ export default function DataProvider({
       groups: initialGroups,
       totalDebt: initialExpenseData.totalDebt,
       totalActiveExpenses: initialExpenseData.totalActiveExpenses,
+
+      sessionUser: initialSessionUser,
+      setSessionUser: (u) => set({ sessionUser: u }),
+
       add: () => set((state) => ({ count: state.count + 1 })),
     }))
   );

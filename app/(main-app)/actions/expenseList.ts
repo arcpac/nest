@@ -21,5 +21,4 @@ export async function getUserExpenseShares(userId: string) {
         .where(and(eq(members.user_id, userId)))
 
     return { userExpenseShares }
-
 }

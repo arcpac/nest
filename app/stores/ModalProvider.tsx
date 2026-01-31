@@ -3,18 +3,42 @@
 import { PropsWithChildren, createContext, useContext, useState } from "react";
 import { createStore, StoreApi } from "zustand";
 import { useStoreWithEqualityFn } from "zustand/traditional";
+import { Member } from "../types";
 
-type ModalType = "pay-expense" | "add-expense" | "edit-expense" | null;
+type ModalType = "pay-expense" | "add-expense" | "edit-expense" | "delete-expenses" | null;
 
 export type PayExpensePayload = {
-    expense: {
-        id: string;
-        title?: string;
-        yourShare: number | string;
+    selectedExpenses?: Set<string> | string[];
+    expense?: {
+        expenseId: string;
+        expenseTitle: string;
+        shareAmount?: string | null;
+        members?: Member[];
     };
 };
+export type AddExpensePayload = {
+    members: Member[]
+}
+export type EditExpensePayload = {
+    expense: {
+        expenseId: string;
+        expenseTitle: string;
+        amount: string;
+        description?: string | null;
+        members: Member[];
+        selectedMemberIds?: string[];
+        shareAmount?: string | null;
+    };
+}
+export type DeleteExpensesPayload = {
+    expenseIds: string[];
+}
 
-type ModalPayload = PayExpensePayload | unknown;
+type ModalPayload =
+    | PayExpensePayload
+    | AddExpensePayload
+    | EditExpensePayload
+    | DeleteExpensesPayload;
 
 type ModalStore = {
     isOpen: boolean;

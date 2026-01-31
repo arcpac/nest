@@ -12,11 +12,12 @@ export default async function middleware(req: NextRequest) {
   const isPublicRoute = publicRoutes.some(
     (route) => path === route || path.startsWith(`${route}/`)
   );
+  const isCreateExpenseRoute = /^\/groups\/[^/]+\/create-expense$/.test(path);
 
   // Get the JWT token from next-auth
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (isProtectedRoute && !token?.id)
+  if (isProtectedRoute && !token?.id && !isCreateExpenseRoute)
     return NextResponse.redirect(new URL("/login", req.url));
 
   if (isPublicRoute && token?.id)

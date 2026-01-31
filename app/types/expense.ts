@@ -7,8 +7,20 @@ export interface Expense {
   isEqual: boolean;
   created_by: string;
   createdAt: Date;
-  yourShare: string;
   isPaid: boolean;
+}
+
+export interface GroupExpenseShare {
+  id: string;
+  title: string;
+  amount: string;
+  description: string | null;
+  isEqual: boolean;
+  created_by: string;
+  createdAt: Date;
+  shareAmount: string | null;
+  isPaid: boolean;
+  memberIds: string[];
 }
 
 // Array type for multiple expenses
