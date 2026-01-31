@@ -50,7 +50,6 @@ const ExpenseList = ({
     }
     setSelectedExpenses(newSelected);
   };
-  console.log('Expenses in ExpenseList: ', expenses)
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="rounded-xl bg-gray-50 p-2">

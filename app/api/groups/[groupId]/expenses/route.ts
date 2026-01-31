@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const auth = request.headers.get("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  const {groupId} = await params;
+  const { groupId } = await params;
 
   if (!groupId) {
     return NextResponse.json({ ok: false, error: "Missing groupId" }, { status: 400 });
@@ -31,7 +31,7 @@ export async function GET(
   // const isMember = await isUserInGroup(groupId, userId);
   // if (!isMember) return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
 
-  const {expenses} = await getGroupExpenses(groupId, userId);
+  const { expenses } = await getGroupExpenses(groupId, userId);
 
   return NextResponse.json({ ok: true, data: expenses });// expensesShares
 }
