@@ -94,7 +94,6 @@ export const loginUser = publicAction
     return { success: true };
   });
 
-
 export const loginOtp = publicAction
   .metadata({ actionName: "loginOtp" })
   .inputSchema(loginOtpSchema, {

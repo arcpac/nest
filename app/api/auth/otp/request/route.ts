@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { sendOtp } from "@/lib/mailer";
 import { db } from "@/db";
 import { otpChallenges } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export const runtime = "nodejs";
 
@@ -55,7 +56,17 @@ export async function POST(req: Request) {
     user_agent: req.headers.get("user-agent") ?? null,
   });
 
-  await sendOtp({ to: email, code: otp });
+  try{
+    await sendOtp({ to: email, code: otp });
+    await db.update(otpChallenges)
+    .set({ sent_at: new Date() })
+    .where(eq(otpChallenges.id, challengeId));
+  }catch(e){
+    console.error("sendOtp failed", { challengeId, email, err: e });
+    await db.update(otpChallenges)
+    .set({ failed_at: new Date() })
+    .where(eq(otpChallenges.id, challengeId));
+  }
 
   return NextResponse.json({ ok: true, challengeId });
 }

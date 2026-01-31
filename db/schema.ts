@@ -117,7 +117,8 @@ export const otpChallenges = pgTable("otpchallenges", {
 
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
   used_at: timestamp("used_at", { withTimezone: true }),
-
+  sent_at: timestamp("sent_at", { withTimezone: true }),
+  failed_at: timestamp("failed_at", { withTimezone: true }),
   attempts: integer("attempts").notNull().default(0),
 
   // optional but useful
