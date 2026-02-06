@@ -38,8 +38,8 @@ export const createExpense = protectedAction
       },
       ctx,
     }) => {
-      const userID = ctx.session.user.id;
-      console.log('CREATEEXPENSE')
+      const userID = ctx.user.id;
+
       if (amount <= 0) {
         return {
           isSuccess: false,
@@ -73,14 +73,13 @@ export const createExpense = protectedAction
           isEqual,
         })
         .returning();
-      console.log('new expense created: ', newExpense)
 
       if (isEqual) {
         const memberSet = new Set(selectedMemberIds && selectedMemberIds.length > 0 ? selectedMemberIds : groupMembers.map((m) => m.id));
 
-        console.log('memberSet: ', memberSet)
+
         const targetMembers = groupMembers.filter((m) => memberSet.has(m.id));
-        console.log('targetMembers: ', targetMembers)
+
         if (targetMembers.length === 0) {
           return {
             isSuccess: false,
@@ -88,7 +87,7 @@ export const createExpense = protectedAction
           };
         }
         const shareAmount = amount / targetMembers.length;
-        console.log('shareamount: ', shareAmount)
+
         const shareEntries = targetMembers.map((member) => ({
           expense_id: newExpense.id,
           member_id: member.id,
@@ -96,10 +95,8 @@ export const createExpense = protectedAction
           paid: false,
         }));
 
-        console.log('shareEntries: ', shareEntries)
 
         const newlyCreatedExpenseShare = await db.insert(expense_shares).values(shareEntries).returning();;
-        console.log('newlyCreatedExpenseShare', newlyCreatedExpenseShare)
       } else {
         if (!selectedMemberIds || selectedMemberIds.length === 0) {
           return {

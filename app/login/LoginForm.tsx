@@ -12,6 +12,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import SocialLogin from "./SocialLogin";
 import { ResendOtpButton } from "./components/ResendCodeButton";
+import { requestOtp } from "../(main-app)/actions/requestOtp";
 
 type FormErrors =
   | {
@@ -87,21 +88,15 @@ export function LoginForm() {
   }, [cooldownUntil]);
 
   const { execute: handleLoginUser } = useAction(loginUser, {
-    onSuccess: async ({ }) => {
-      const normalizedEmail =
-        submittedEmailRef.current ?? normalizeLoginEmail(email);
-      const res = await signIn("credentials", {
-        email: normalizedEmail,
-        password,
-        redirect: false,
-      });
-      if (res?.ok) {
+    onSuccess: async ({ data }) => {
+
+      if (data?.success) {
         router.push("/groups");
-      } else {
-        setFieldErrors({
-          unauthorised: ["Incorrect email and password."],
-        });
+        return;
       }
+
+      // in case your action returns success:false but doesn't throw
+      setFieldErrors({ unauthorised: ["Invalid email or password."] });
     },
     onError({ error }) {
       if (error.serverError) {
@@ -111,7 +106,6 @@ export function LoginForm() {
           const parsed = JSON.parse(raw);
           if (parsed.code === "RATE_LIMIT") {
             const ms = Number(parsed.retryAfterMs ?? 30_000);
-
             setCooldownUntil(Date.now() + ms);
             setFieldErrors({ unauthorised: [parsed.message] });
             return;
@@ -124,50 +118,26 @@ export function LoginForm() {
         return;
       }
 
-      if (error.validationErrors) setFieldErrors(error.validationErrors);
+      console.log('Error: ', error)
     },
   });
 
-  const { execute: handleLoginOtp } = useAction(loginOtp, {
-    onSuccess: async ({ data }) => {
-      if (!data.challengeId) {
-        setFieldErrors({
-          unauthorised: [
-            "If an account exists for that email, we sent a code.",
-          ],
-        });
+  const { execute: handleEmailSubmit } = useAction(requestOtp, {
+    onSuccess: ({ data }) => {
+      if (!data?.success) {
+        setError(data?.message ?? "Failed to send code.");
         return;
       }
 
-      setFieldErrors({});
-      setChallengeId(data.challengeId);
-
+      setError(null);
+      // move to next step
       setStep(2);
+
+      // optional: start cooldown UI
+      setCooldownUntil(Date.now() + 30_000);
     },
     onError({ error }) {
-      // Rate limit handling (same pattern you used)
-      if (error.serverError) {
-        const raw = String(error.serverError);
-
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed.code === "RATE_LIMIT") {
-            const ms = Number(parsed.retryAfterMs ?? 30_000);
-            setCooldownUntil(Date.now() + ms);
-            setFieldErrors({ unauthorised: [parsed.message] });
-            return;
-          }
-        } catch {
-          // not JSON, ignore
-        }
-
-        setFieldErrors({ unauthorised: [raw] });
-        return;
-      }
-
-      if (error.validationErrors) {
-        setFieldErrors(error.validationErrors);
-      }
+      setError(error.serverError ? String(error.serverError) : "Failed to send code.");
     },
   });
 
@@ -369,7 +339,7 @@ export function LoginForm() {
                 {
                   loginWithPassword
                     ? handleLoginUser({ email: normalizedEmail, password })
-                    : handleLoginOtp({ email: normalizedEmail });
+                    : handleEmailSubmit({ email: normalizedEmail });
                 }
               }}
             >

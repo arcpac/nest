@@ -1,9 +1,20 @@
 // scripts/seed.ts
+// NOTE: With Supabase Auth, do NOT seed auth.users here.
+// This script seeds app data (groups/members/expenses/shares) around one or more
+// existing Supabase Auth users.
+
 import { sql } from "drizzle-orm";
 import { db } from "./db";
-import { groups, users, members, expenses, expense_shares, posts, otpChallenges } from "./schema";
+import {
+  groups,
+  users,
+  members,
+  expenses,
+  expense_shares,
+  posts,
+  otpChallenges,
+} from "./schema";
 import { randomUUID } from "crypto";
-import bcrypt from "bcryptjs";
 import { faker } from "@faker-js/faker";
 
 function toCents(n: number) {
@@ -14,77 +25,129 @@ function fromCents(c: number) {
 }
 
 async function seed() {
-  // ✅ Clear tables (reverse dependency order)
+  // ✅ Clear app tables (reverse dependency order)
+  // IMPORTANT: We do NOT delete from public.users in a Supabase Auth setup.
   await db.execute(sql`DELETE FROM ${expense_shares}`);
   await db.execute(sql`DELETE FROM ${expenses}`);
   await db.execute(sql`DELETE FROM ${posts}`);
   await db.execute(sql`DELETE FROM ${members}`);
   await db.execute(sql`DELETE FROM ${groups}`);
-  await db.execute(sql`DELETE FROM ${otpChallenges}`); // safest before users (depends on your schema)
-  await db.execute(sql`DELETE FROM ${users}`);
+  await db.execute(sql`DELETE FROM ${otpChallenges}`);
 
-  // --- USERS ---
-  const passwordHash = await bcrypt.hash("Pass123!.", 10);
+  // --- USERS (profiles only) ---
+  // Provide existing Auth user IDs via env:
+  //   SEED_USER_IDS="uuid1,uuid2,uuid3"
+  // Optionally:
+  //   SEED_USER_EMAILS="a@x.com,b@x.com,c@x.com" (same count/order)
+  const rawIds = process.env.SEED_USER_IDS?.trim();
+  if (!rawIds) {
+    throw new Error(
+      "Missing SEED_USER_IDS. Add e.g. SEED_USER_IDS=ecaf0a31-... to .env.local"
+    );
+  }
 
-  const newUsers = [
-    {
-      id: randomUUID(),
-      username: "admin",
-      role: "user", // change to "admin" if your app supports it
-      email: "admin@example.com",
-      password: passwordHash,
-    },
-    ...Array.from({ length: 6 }).map(() => ({
-      id: randomUUID(),
-      username: faker.internet.username(),
+  const seedUserIds = rawIds
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const seedEmails = (process.env.SEED_USER_EMAILS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  // Ensure profile rows exist (idempotent)
+  // NOTE: password is intentionally blank; Supabase Auth owns passwords.
+  const profileRows = seedUserIds.map((id, idx) => {
+    const email = seedEmails[idx] || `seed${idx + 1}@example.com`;
+    return {
+      id,
+      email,
+      username: `seed_user_${idx + 1}`,
       role: "user",
-      email: faker.internet.exampleEmail({ allowSpecialCharacters: false }).toLowerCase(),
-      password: passwordHash,
-    })),
-  ];
+      password: "", // consider dropping this column later
+    };
+  });
 
-  const seededUsers = await db.insert(users).values(newUsers).returning();
-  const [user1, user2, user3, user4, user5, user6, user7] = seededUsers;
+  // Insert profiles if missing. If your Drizzle version supports onConflictDoNothing, use it.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  await db.insert(users).values(profileRows).onConflictDoNothing();
+
+  // For convenience below
+  const seededUsers = profileRows.map((u) => ({ id: u.id, email: u.email }));
+  const pickUser = (i: number) => seededUsers[i % seededUsers.length];
 
   // --- GROUPS ---
   const seededGroups = await db
     .insert(groups)
     .values([
-      { id: randomUUID(), name: "Roommates", created_by: user1.id, active: true },
-      { id: randomUUID(), name: "Weekend Trip", created_by: user2.id, active: true },
-      { id: randomUUID(), name: "Family Bills", created_by: user3.id, active: true },
+      { id: randomUUID(), name: "Roommates", created_by: pickUser(0).id, active: true },
+      { id: randomUUID(), name: "Weekend Trip", created_by: pickUser(1).id, active: true },
+      { id: randomUUID(), name: "Family Bills", created_by: pickUser(2).id, active: true },
     ])
     .returning();
 
   const [group1, group2, group3] = seededGroups;
 
   // --- MEMBERS (make every group usable) ---
-  // Ensure: creators are members + groups have multiple members
+  // Ensure: creators are members + groups have multiple members.
+  // If you only provide 1-2 SEED_USER_IDS, we will avoid creating duplicate
+  // memberships that violate unique(user_id, group_id).
+  const uniqueUsers = (count: number) => {
+    const out: { id: string; email: string }[] = [];
+    const seen = new Set<string>();
+    for (let i = 0; i < seededUsers.length && out.length < count; i++) {
+      const u = pickUser(i);
+      if (seen.has(u.id)) continue;
+      seen.add(u.id);
+      out.push(u);
+    }
+    return out;
+  };
+
+  const group1Users = uniqueUsers(3);
+  const group2Users = uniqueUsers(3);
+  const group3Users = uniqueUsers(3);
+
   const memberValues = [
-    // group1
-    { id: randomUUID(), group_id: group1.id, user_id: user1.id, email: user1.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-    { id: randomUUID(), group_id: group1.id, user_id: user2.id, email: user2.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-    { id: randomUUID(), group_id: group1.id, user_id: user4.id, email: user4.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-
-    // group2
-    { id: randomUUID(), group_id: group2.id, user_id: user2.id, email: user2.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-    { id: randomUUID(), group_id: group2.id, user_id: user3.id, email: user3.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-    { id: randomUUID(), group_id: group2.id, user_id: user5.id, email: user5.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-
-    // group3
-    { id: randomUUID(), group_id: group3.id, user_id: user3.id, email: user3.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-    { id: randomUUID(), group_id: group3.id, user_id: user6.id, email: user6.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
-    { id: randomUUID(), group_id: group3.id, user_id: user7.id, email: user7.email, first_name: faker.person.firstName(), last_name: faker.person.lastName() },
+    ...group1Users.map((u) => ({
+      id: randomUUID(),
+      group_id: group1.id,
+      user_id: u.id,
+      email: u.email,
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
+    })),
+    ...group2Users.map((u) => ({
+      id: randomUUID(),
+      group_id: group2.id,
+      user_id: u.id,
+      email: u.email,
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
+    })),
+    ...group3Users.map((u) => ({
+      id: randomUUID(),
+      group_id: group3.id,
+      user_id: u.id,
+      email: u.email,
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
+    })),
   ];
 
   const seededMembers = await db.insert(members).values(memberValues).returning();
 
   // Helper: groupId -> member rows
-  const membersByGroup = seededMembers.reduce<Record<string, typeof seededMembers>>((acc, m) => {
-    acc[m.group_id] ??= [];
-    acc[m.group_id].push(m);
-    return acc;
-  }, {});
+  const membersByGroup = seededMembers.reduce<Record<string, typeof seededMembers>>(
+    (acc, m) => {
+      acc[m.group_id] ??= [];
+      acc[m.group_id].push(m);
+      return acc;
+    },
+    {}
+  );
 
   // --- EXPENSES + SHARES ---
   const allGroups = [group1, group2, group3];
@@ -94,11 +157,9 @@ async function seed() {
     const g = allGroups[i % allGroups.length];
     const groupMembers = membersByGroup[g.id];
 
-    // choose a creator from *members of that group* (more realistic)
     const creatorMember = faker.helpers.arrayElement(groupMembers);
     const creatorUserId = creatorMember.user_id;
 
-    // generate amount as number then store as "xx.xx" string
     const amountNum = faker.number.float({ min: 10, max: 250, fractionDigits: 2 });
     const amount = amountNum.toFixed(2);
 
@@ -107,7 +168,7 @@ async function seed() {
       .values({
         id: randomUUID(),
         title: faker.commerce.productName(),
-        amount, // numeric column; drizzle/pg often accepts string
+        amount,
         description: faker.commerce.productDescription(),
         created_by: creatorUserId,
         group_id: g.id,
@@ -115,7 +176,6 @@ async function seed() {
       })
       .returning();
 
-    // Equal split across members (in cents, to avoid rounding issues)
     const totalCents = toCents(amountNum);
     const base = Math.floor(totalCents / groupMembers.length);
     const remainder = totalCents - base * groupMembers.length;
@@ -127,7 +187,7 @@ async function seed() {
         expense_id: expense.id,
         member_id: m.id,
         share: fromCents(cents),
-        paid: faker.datatype.boolean({ probability: 0.35 }), // 35% randomly paid
+        paid: faker.datatype.boolean({ probability: 0.35 }),
       };
     });
 

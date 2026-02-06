@@ -17,13 +17,13 @@ export const deleteExpense = protectedAction
       flattenValidationErrors(ve).fieldErrors,
   })
   .action(async ({ parsedInput: { expenseIds }, ctx }) => {
-    const userID = ctx.session.user.id;
+    const userID = ctx.user.id;
 
     const deletedExpenses = await db
       .delete(expenses)
       .where(and(inArray(expenses.id, expenseIds)))
       .returning({ id: expenses.id });
-    console.log('DeletedExpenses: ', deletedExpenses)
+
     if (deletedExpenses.length === 0) {
       return {
         isSuccess: false,

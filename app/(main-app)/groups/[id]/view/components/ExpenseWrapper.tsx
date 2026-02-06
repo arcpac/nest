@@ -12,7 +12,7 @@ export default async function ExpenseWrapper({
   members: Members;
 }) {
   const { expenses } = await getGroupExpenses(groupId, userId);
-  console.log('getgroup expense: ', userId)
+
   return (
     <div className="col-span-4">
       <ExpenseList expenses={expenses} members={members} groupId={groupId} />

@@ -64,6 +64,7 @@ export default function EditExpenseModal() {
 
     const { execute: editExpenseAction } = useAction(editExpense, {
         onSuccess: ({ data }) => {
+            debugger
             setIsSubmitting(false);
             if (data?.isSuccess) {
                 close();

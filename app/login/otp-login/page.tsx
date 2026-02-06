@@ -2,9 +2,10 @@
 
 import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useAction } from "next-safe-action/hooks";
-import { publicAction } from "@/lib/public-action";
+import { requestOtp } from "@/app/(main-app)/actions/requestOtp";
 
 type ApiError = {
   serverError?: string;
@@ -58,99 +59,63 @@ export default function OtpLoginPage() {
 
   const cooldownMs = cooldownUntil ? Math.max(0, cooldownUntil - now) : 0;
   const isCooldown = cooldownMs > 0;
-
-  async function requestOtp() {
-    setError(null);
-    setIsRequesting(true);
-
-    try {
-      const res = await fetch("/api/auth/otp/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as any;
-      if (!res.ok) {
-        const apiErr = data as ApiError;
-        if (apiErr.retryAfterMs) {
-          setCooldownUntil(Date.now() + apiErr.retryAfterMs);
-        }
-        setError(apiErr.serverError || apiErr.error || "Something went wrong.");
+  const { execute: handleEmailSubmit } = useAction(requestOtp, {
+    onSuccess: ({ data }) => {
+      debugger
+      if (!data?.success) {
+        setError(data?.message ?? "Failed to send code.");
         return;
       }
 
-      if (!data.challengeId) {
-        // keep generic (don’t leak existence) but you can still proceed
-        setError("If an account exists for that email, we sent a code.");
-        return;
-      }
-
-      setChallengeId(data.challengeId);
+      setError(null);
+      // move to next step
       setStep(2);
-      setCode("");
-    } catch {
-      setError("Network error. Please try again.");
-    } finally {
-      setIsRequesting(false);
-    }
-  }
 
-  function onEmailSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (isRequesting || isCooldown) return;
-    requestOtp();
-  }
+      // optional: start cooldown UI
+      setCooldownUntil(Date.now() + 30_000);
+    },
+    onError({ error }) {
+      setError(error.serverError ? String(error.serverError) : "Failed to send code.");
+    },
+  });
+
 
   async function onCodeSubmit(e: FormEvent) {
     e.preventDefault();
-    if (isVerifying || !challengeId) return;
-
-    // optionally guard cooldown too
+    if (isVerifying) return;
     if (isCooldown) return;
 
     setError(null);
     setIsVerifying(true);
 
     try {
-      const res = await signIn("credentials", {
-        method: "otp",
+      const supabase = createSupabaseBrowserClient();
+
+      const { data, error } = await supabase.auth.verifyOtp({
         email,
-        challengeId,
-        code,
-        redirect: false,
+        token: code,
+        type: "email", // for email OTP
       });
 
-      if (res?.ok) {
-        router.push("/groups");
-        router.refresh();
+      if (error) {
+        const msg = error.message?.toLowerCase().includes("rate limit")
+          ? "Too many attempts. Please wait a bit and try again."
+          : error.message ?? "Invalid code.";
+
+        setError(msg);
         return;
       }
 
-      // NextAuth often returns a string error; we’ll try to parse JSON (your RATE_LIMIT shape)
-      const raw = String(res?.error ?? "Invalid code.");
-
-      try {
-        const parsed = JSON.parse(raw);
-        if (parsed.code === "RATE_LIMIT") {
-          const ms = Number(parsed.retryAfterMs ?? 30_000);
-          setCooldownUntil(Date.now() + ms);
-          setError(
-            parsed.message ?? "Too many attempts. Please try again shortly."
-          );
-          return;
-        }
-      } catch {
-        // not JSON
-      }
-
-      setError(raw === "CredentialsSignin" ? "Invalid code." : raw);
+      // ✅ session is now set in cookies/storage automatically
+      router.push("/groups");
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
       setIsVerifying(false);
     }
   }
+
 
   function goBackToEmail() {
     setStep(1);
@@ -184,7 +149,7 @@ export default function OtpLoginPage() {
         ) : null}
 
         {step === 1 ? (
-          <form onSubmit={onEmailSubmit} className="mt-6 space-y-4">
+          <div className="mt-6 space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
                 Email
@@ -199,24 +164,25 @@ export default function OtpLoginPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={!canRequest || isRequesting || isCooldown}
-              className="w-full rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+            <div
+              onClick={() => {
+                if (isCooldown) return;
+                handleEmailSubmit({ email });
+              }} className="w-full rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900"
             >
               {isRequesting
                 ? "Sending code…"
                 : isCooldown
                   ? `Wait ${formatSeconds(cooldownMs)}`
                   : "Send code"}
-            </button>
+            </div>
 
             <div className="text-center text-xs text-neutral-500 dark:text-neutral-400">
               You’ll enter a 6-digit code on the next step.
             </div>
-          </form>
+          </div>
         ) : (
-          <form onSubmit={onCodeSubmit} className="mt-6 space-y-4">
+          <div className="mt-6 space-y-4">
             <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900/30 dark:text-neutral-200">
               Code sent to{" "}
               <span className="font-medium">{maskEmail(email)}</span>
@@ -255,10 +221,8 @@ export default function OtpLoginPage() {
               {isVerifying ? "Verifying…" : "Verify & sign in"}
             </button>
 
-            <button
-              type="button"
-              onClick={() => requestOtp()}
-              disabled={isRequesting || isCooldown}
+            <div
+              onClick={() => handleEmailSubmit({ email })}
               className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
             >
               {isRequesting
@@ -266,8 +230,8 @@ export default function OtpLoginPage() {
                 : isCooldown
                   ? `Resend in ${formatSeconds(cooldownMs)}`
                   : "Resend code"}
-            </button>
-          </form>
+            </div>
+          </div>
         )}
       </div>
     </div>

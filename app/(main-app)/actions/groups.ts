@@ -5,12 +5,21 @@ import { and, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 export async function getTotalUnpaidShares(userId: string) {
   const [row] = await db
     .select({
-      totalDebt: sql<string>`COALESCE(SUM(${expense_shares.share}), 0)`.as("totalDebt"),
-      unpaidCount: sql<number>`COUNT(*)`.as("unpaidCount"),
+      totalDebt: sql<string>`
+        COALESCE(SUM(${expense_shares.share}), 0)
+      `.as("totalDebt"),
+      unpaidCount: sql<string>`
+        COUNT(*)
+      `.as("unpaidCount"),
     })
     .from(members)
     .innerJoin(expense_shares, eq(expense_shares.member_id, members.id))
-    .where(and(eq(members.user_id, userId), eq(expense_shares.paid, false)));
+    .where(
+      and(
+        eq(members.user_id, userId),
+        eq(expense_shares.paid, false)
+      )
+    );
 
   return {
     totalDebt: row?.totalDebt ?? "0",
@@ -130,12 +139,12 @@ export async function getGroupExpenses(groupId: string, userId: string) {
     const expenseIds = groupExpenses.map((expense) => expense.id);
     const expenseMemberIds = expenseIds.length
       ? await db
-          .select({
-            expenseId: expense_shares.expense_id,
-            memberId: expense_shares.member_id,
-          })
-          .from(expense_shares)
-          .where(inArray(expense_shares.expense_id, expenseIds))
+        .select({
+          expenseId: expense_shares.expense_id,
+          memberId: expense_shares.member_id,
+        })
+        .from(expense_shares)
+        .where(inArray(expense_shares.expense_id, expenseIds))
       : [];
 
     const memberIdsByExpense = expenseMemberIds.reduce((acc, share) => {

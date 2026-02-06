@@ -6,21 +6,17 @@ import ExpenseWrapper from "./components/ExpenseWrapper";
 import { Skeleton } from "@/components/ui/skeleton";
 import CardWrapper from "@/app/(main-app)/components/Cards";
 import { TableSkeleton } from "@/app/(main-app)/components/Skeletons";
-import { authOptions } from "@/lib/auth";
+import { authOptions, getUserProfile } from "@/lib/auth";
 import GroupMemberList from "./components/GroupMemberList";
 
 export default async function ViewPage(props: {
   params: Promise<{ id: string; query?: string; page?: string }>;
 }) {
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-
+  const { user } = await getUserProfile();
   const { id } = await props.params;
   const result = await getGroupWithMembers(id);
-
+  console.log('getGroupWithMembers result: ', result)
   if (!result) return <></>;
   const { group, members } = result;
 
@@ -36,12 +32,12 @@ export default async function ViewPage(props: {
         <Suspense fallback={<TableSkeleton />}>
           <ExpenseWrapper
             groupId={group.id}
-            userId={session.user.id}
+            userId={user.id}
             members={members}
           />
         </Suspense>
         <div className="col-span-2">
-          <GroupMemberList groupMembers={members} />
+          <GroupMemberList groupId={group.id} groupMembers={members} />
         </div>
 
       </div>

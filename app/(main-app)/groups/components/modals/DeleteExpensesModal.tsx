@@ -27,7 +27,7 @@ const DeleteExpensesModal = () => {
             close: s.close
         }))
     );
-    console.log('DeleteExpensesModal', data)
+
     const [deleting, setIsDeleting] = useState<boolean>(false);
     const open = isOpen && type === "delete-expenses";
     const { execute: handleDeleteExpense } = useAction(deleteExpense, {

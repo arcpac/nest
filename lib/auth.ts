@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { createSupabaseServerClient } from "./supabase/server";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -73,11 +74,34 @@ export async function getUserId(): Promise<string> {
   return session.user.id;
 }
 
-export async function getUser(): Promise<User> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
+export async function getUser() {
+  const supabase = await createSupabaseServerClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) {
     redirect("/login");
   }
-  return session.user;
+
+  return user;
 }
 
+export async function getUserProfile() {
+  const user = await getUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data: profile, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    // optional: log, throw, or return null
+    throw new Error("User profile not found");
+  }
+
+  return { user, profile };
+}

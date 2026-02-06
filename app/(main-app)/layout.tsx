@@ -3,7 +3,7 @@ import { inter } from "../ui/fonts";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 import DataProvider from "../DataProvider";
-import { getUser } from "@/lib/auth";
+import { getUser, getUserProfile } from "@/lib/auth";
 import { getTotalUnpaidShares, getUserGroups } from "./actions/groups";
 
 
@@ -13,15 +13,19 @@ export default async function MainAppLayout({
   children: React.ReactNode;
 }) {
 
-  const user = await getUser();
+  const { user, profile } = await getUserProfile();
 
-  const [userGroups, { totalDebt, unpaidCount }] = await Promise.all([
+  const [userGroups] = await Promise.all([
     getUserGroups(user.id),
-    getTotalUnpaidShares(user.id),
+    // getTotalUnpaidShares(user.id),
   ]);
-
-  const initialSessionUser = { id: user.id, name: user.name ?? null, email: user.email ?? null }
-
+  const totalDebt = "12"
+  const unpaidCount = 12
+  const initialSessionUser = {
+    id: user.id,
+    name: profile.username ?? null,
+    email: user.email,
+  };
   return (
     <div className={`main-app-layout flex h-screen ${inter.className}`}>
       <SidebarProvider>

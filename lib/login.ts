@@ -10,6 +10,7 @@ import { publicAction } from "./public-action";
 import { headers } from "next/headers";
 import crypto from "crypto";
 import { sendOtp } from "./mailer";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 // export const runtime = "nodejs";
 
@@ -62,37 +63,28 @@ function hashOtp(challengeId: string, otp: string) {
   return cryptoResult;
 }
 
+
 export const loginUser = publicAction
   .metadata({ actionName: "loginUser" })
-  .inputSchema(loginSchema, {
-    handleValidationErrorsShape: async (ve) =>
-      flattenValidationErrors(ve).fieldErrors,
-  })
+  .inputSchema(loginSchema)
   .action(async ({ parsedInput: { email, password } }) => {
-    const normalizedEmail = normalizeEmail(email);
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizeEmail(email),
+      password,
+    });
 
-    const invalid = {
-      success: false as const,
-      fieldErrors: { unauthorised: "Invalid email or password" },
-    };
+    if (error || !data.session) {
+      return {
+        success: false as const,
+        fieldErrors: { unauthorised: "Invalid email or password" },
+      };
+    }
 
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, normalizedEmail))
-      .limit(1)
-      .then((res) => res[0]);
-
-    if (!user) return invalid;
-
-    // ✅ if OTP users have no password set
-    if (!user.password) return invalid;
-
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) return invalid;
-
-    return { success: true };
+    // Cookies are now set 🎉
+    return { success: true as const };
   });
+
 
 export const loginOtp = publicAction
   .metadata({ actionName: "loginOtp" })

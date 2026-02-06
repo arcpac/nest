@@ -20,8 +20,9 @@ import { Label } from "@/components/ui/label";
 import { AddExpensePayload, useModalStore } from "@/app/stores/ModalProvider";
 import { Member } from "@/app/types";
 import { useAction } from "next-safe-action/hooks";
-import { createExpense } from "@/app/(main-app)/actions/createExpense";
+
 import { useParams, useRouter } from "next/navigation";
+import { createExpense } from "@/app/(main-app)/actions/createExpense";
 
 const CustomClearText: FunctionComponent = () => <>clear all</>;
 
@@ -78,7 +79,8 @@ export default function CreateExpenseModal() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
     const memberOptions: MemberOption[] = (members ?? []).map((member) => {
-        const name = `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim();
+
+        const name = member.first_name === null && member.last_name === null ? member.email.trim() : `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim();
         return {
             value: member.id,
             label: name,
@@ -130,7 +132,7 @@ export default function CreateExpenseModal() {
             selectedMemberIds: newSelectedMembers
         });
     };
-
+    console.log('members: ', members)
     return (
         <Dialog open={open} onOpenChange={(v) => !v && close()}>
             <DialogContent className="rounded">

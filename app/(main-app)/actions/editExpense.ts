@@ -25,7 +25,7 @@ export const editExpense = protectedAction
       parsedInput: { expenseId, title, amount, description, selectedMemberIds },
       ctx,
     }) => {
-      const userID = ctx.session.user.id;
+      const userID = ctx.user.id;
 
       const [existingExpense] = await db
         .select({
@@ -36,7 +36,6 @@ export const editExpense = protectedAction
         })
         .from(expenses)
         .where(and(eq(expenses.id, expenseId)));
-      console.log('EXISTING EXPENSE: ', existingExpense)
 
       if (!existingExpense) {
         return {

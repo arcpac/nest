@@ -15,6 +15,7 @@ import { PayExpensePayload, useModalStore } from "@/app/stores/ModalProvider";
 import { useAction } from "next-safe-action/hooks";
 import { payExpense } from "@/app/(main-app)/actions/payExpense";
 import { useRouter } from "next/navigation";
+import { payExpenseTest } from "@/app/(main-app)/actions/payExpenseTest";
 
 const PayExpenseModal = () => {
     const router = useRouter();
@@ -50,7 +51,7 @@ const PayExpenseModal = () => {
         setError(null);
     }, [open, selectedExpenseIds.length]);
 
-    const { execute: payExpenseAction } = useAction(payExpense, {
+    const { execute: payExpenseAction } = useAction(payExpenseTest, {
         onSuccess: ({ data }) => {
             setIsSubmitting(false);
             if (data?.isSuccess) {
