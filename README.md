@@ -29,8 +29,8 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-
 ## Database details
+
 - [**Postgres**](https://orm.drizzle.team/docs/get-started/postgresql-new) – Relational database engine (RDBMS)
 - [**Drizzle**](https://orm.drizzle.team/docs/get-started/postgresql-new) – Type-safe ORM / query builder for TypeScript
 - [**dbDiagram**](https://dbdiagram.io/home) – Database schema visualization tool
@@ -38,30 +38,34 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ### Setup database environment
 
 ## Nest App
+
 First, run the development server:
 
 ## Upcoming features
 
 ### 1. Receipt capture → OCR → auto expense draft
+
 **What:** Upload a receipt and automatically pre-fill expense details (amount, date, merchant).  
 **Approach:** Use an OCR provider (or start with “manual + smart suggestions” as an MVP).  
 **Senior signals:** Async processing pipeline, file storage, retries, parsing confidence scores.  
 **MVP scope:** Upload → background job extracts fields → user confirms → creates expense.
 
 ### 2. Notifications (Email + Push)
+
 **What:** Notify members when they’re added, when an expense is created, and when balances change.  
 **Email provider:** Resend / SendGrid / similar.  
 **Push:** Web Push (PWA) for real-time notifications.  
-**Senior signals:** Event-driven design, notification preferences, batching/digests.  
+**Senior signals:** Event-driven design, notification preferences, batching/digests.
 
 ### 3. Invite to household via magic links
+
 **What:** Invite members via a secure token link to join a household.  
 **Senior signals:** Secure token design, expiry handling, replay protection.
-
 
 # SplitNest
 
 ## Prerequisites
+
 - Node.js (LTS recommended)
 - PostgreSQL running locally (or a hosted Postgres instance)
 - (Optional) An SMTP provider for email/OTP delivery (e.g., Mailtrap for testing)
@@ -72,24 +76,38 @@ First, run the development server:
 
 Create a `.env` file in the project root and add the following variables:
 
-```bash
-# Database
-DATABASE_URL="postgresql://<user>:<password>@localhost:5432/nest"
+# Cloud database setup
 
-# Auth
-NEXTAUTH_SECRET="your-random-secret"
+###### DATABASE_URL="postgresql://[name]>:root@localhost:5432/nest"
 
-# Upstash Redis (Rate limiting)
-UPSTASH_REDIS_REST_URL="https://..."
-UPSTASH_REDIS_REST_TOKEN="..."
+DATABASE_URL="postgresql://postgres.[supabase]:[supabasepassword].@aws-1-ap-south-1.pooler.supabase.com:[port]/postgres?sslmode=require"
 
-# SMTP (Email)
-SMTP_HOST="sandbox.smtp.mailtrap.io"
+# Cloud database setup
+
+SUPABASE_URL='https://[supabase].supabase.co'
+NEXT_PUBLIC_SUPABASE_ANON_KEY='[anonkey]'
+SERVICE_ROLE_KEY='SERVICE_ROLE_KEY'
+SEED_USER_IDS='useradminseedIDs'
+
+SITE_URL=http://localhost:3000
+
+SEED_USER_EMAILS='[youradmin@email]'
+
+UPSTASH_REDIS_REST_URL="UPSTASH_REDIS_REST_URL"
+UPSTASH_REDIS_REST_TOKEN="UPSTASH_REDIS_REST_TOKEN"
+
+SMTP_HOST=sandbox.smtp.mailtrap.io
 SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER="..."
-SMTP_PASS="..."
+SMTP_SECURE=
+SMTP_USER=
+SMTP_PASS=
 SMTP_FROM="SplitNest <no-reply@domain.com>"
 
-# OTP
-OTP_SECRET="some-long-random-string"
+OTP_SECRET=
+
+NEXTAUTH_SECRET=""
+MOBILE_JWT_SECRET=""
+
+```
+
+```
