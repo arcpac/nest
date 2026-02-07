@@ -2,14 +2,15 @@
 
 import { z } from "zod";
 import { flattenValidationErrors } from "next-safe-action";
-import { actionClient } from "@/lib/safe-action";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { publicAction } from "@/lib/public-action";
 
 const requestOtpSchema = z.object({
     email: z.email(),
 });
 
-export const requestOtp = actionClient
+export const requestOtp = publicAction
+    .metadata({ actionName: "requestOtp" })
     .inputSchema(requestOtpSchema, {
         handleValidationErrorsShape: async (ve) =>
             flattenValidationErrors(ve).fieldErrors,

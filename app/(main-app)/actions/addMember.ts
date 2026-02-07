@@ -9,10 +9,11 @@ import { and, eq } from "drizzle-orm";
 
 const addMemberSchema = z.object({
     groupId: z.string().min(1),
-    email: z.string().email(),
+    email: z.email(),
 });
 
 export const addMember = protectedAction
+    .metadata({ actionName: 'addGroupMember' })
     .inputSchema(addMemberSchema, {
         handleValidationErrorsShape: async (ve) =>
             flattenValidationErrors(ve).fieldErrors,

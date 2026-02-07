@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { actionClient, protectedAction } from "@/lib/safe-action";
+import { protectedAction } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 import { expenses, expense_shares, members } from "@/db/schema";
 import { db } from "@/db";
@@ -10,6 +10,7 @@ import { getServerSession } from "next-auth";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import { User } from "@supabase/supabase-js";
 
 const expenseSchema = z.object({
   title: z.string().min(1).max(50),
@@ -21,6 +22,7 @@ const expenseSchema = z.object({
   selectedMemberIds: z.array(z.string()).optional(),
 });
 export const createExpense = protectedAction
+  .metadata({ actionName: "createExpense" })
   .inputSchema(expenseSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
@@ -38,7 +40,7 @@ export const createExpense = protectedAction
       },
       ctx,
     }) => {
-      const userID = ctx.user.id;
+      const userID = (ctx as any).user.id
 
       if (amount <= 0) {
         return {

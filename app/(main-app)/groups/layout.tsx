@@ -1,8 +1,6 @@
-import { getUserId } from "@/lib/auth";
-import DataProvider from "@/app/DataProvider";
-import { getUserGroups } from "../actions/groups";
 import ModalProvider from "@/app/stores/ModalProvider";
 import ModalOutlet from "./components/modals/ModalOutlet";
+import { Toaster } from "@/components/ui/sonner";
 
 
 export default async function GroupsLayout({
@@ -14,6 +12,7 @@ export default async function GroupsLayout({
   return (
     <ModalProvider>
       <ModalOutlet />
+
       {children}
     </ModalProvider>
   );

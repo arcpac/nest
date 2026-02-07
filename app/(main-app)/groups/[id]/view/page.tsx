@@ -16,7 +16,6 @@ export default async function ViewPage(props: {
   const { user } = await getUserProfile();
   const { id } = await props.params;
   const result = await getGroupWithMembers(id);
-  console.log('getGroupWithMembers result: ', result)
   if (!result) return <></>;
   const { group, members } = result;
 

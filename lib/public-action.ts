@@ -7,7 +7,7 @@ import { headers } from "next/headers";
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
-class ActionError extends Error {}
+class ActionError extends Error { }
 class RateLimitError extends ActionError {
   constructor(message: string, public retryAfterMs?: number) {
     super(message);
@@ -52,19 +52,19 @@ export const publicAction = createSafeActionClient({
   },
 }).use(async ({ next, metadata, clientInput }) => {
   // Only rate-limit specific public actions
-  const limited = new Set(["loginUser", "registerUser"]);
+  const limited = new Set(["loginUser", "registerUser", "requestOtp"]);
   if (!metadata || !limited.has(metadata.actionName)) {
     return next();
   }
 
-  const ip = getClientIp();
+  const ip = await getClientIp();
 
   // If the action has an email, include it (slows targeted brute force)
   const maybeEmail =
     typeof clientInput === "object" && clientInput && "email" in clientInput
       ? String((clientInput as any).email)
-          .toLowerCase()
-          .trim()
+        .toLowerCase()
+        .trim()
       : "";
 
   const key = maybeEmail
