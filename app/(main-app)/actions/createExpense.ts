@@ -5,12 +5,8 @@ import { protectedAction } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 import { expenses, expense_shares, members } from "@/db/schema";
 import { db } from "@/db";
-import { getServerSession } from "next-auth";
 
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import { User } from "@supabase/supabase-js";
 
 const expenseSchema = z.object({
   title: z.string().min(1).max(50),
@@ -21,6 +17,7 @@ const expenseSchema = z.object({
   customShares: z.record(z.string(), z.string()).optional(),
   selectedMemberIds: z.array(z.string()).optional(),
 });
+
 export const createExpense = protectedAction
   .metadata({ actionName: "createExpense" })
   .inputSchema(expenseSchema, {
@@ -40,7 +37,8 @@ export const createExpense = protectedAction
       },
       ctx,
     }) => {
-      const userID = (ctx as any).user.id
+      const userID = (ctx as any)?.user?.id;
+      if (!userID) throw new Error("Unauthorized");
 
       if (amount <= 0) {
         return {
@@ -97,8 +95,7 @@ export const createExpense = protectedAction
           paid: false,
         }));
 
-
-        const newlyCreatedExpenseShare = await db.insert(expense_shares).values(shareEntries).returning();;
+        await db.insert(expense_shares).values(shareEntries).returning();
       } else {
         if (!selectedMemberIds || selectedMemberIds.length === 0) {
           return {

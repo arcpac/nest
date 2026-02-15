@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { members, users } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { createSupabaseServerClient } from "./supabase/server";
+import { cache } from "react";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -74,22 +75,16 @@ export async function getUserId(): Promise<string> {
   return session.user.id;
 }
 
-export async function getUser() {
+export const getUser = cache(async () => {
   const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) {
-    redirect("/login");
-  }
-
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) redirect("/login");
   return user;
-}
+});
 
 export async function getUserProfile() {
   const user = await getUser();
+
   const supabase = await createSupabaseServerClient();
 
   const { data: profile, error } = await supabase
@@ -98,10 +93,21 @@ export async function getUserProfile() {
     .eq("id", user.id)
     .single();
 
+
   if (error) {
     // optional: log, throw, or return null
     throw new Error("User profile not found");
   }
 
   return { user, profile };
+}
+
+export async function requireGroupMember(userId: string, groupId: string) {
+  const [row] = await db
+    .select({ id: members.id })
+    .from(members)
+    .where(and(eq(members.user_id, userId), eq(members.group_id, groupId)))
+    .limit(1);
+
+  return !!row;
 }

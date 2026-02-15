@@ -12,7 +12,6 @@ export default async function GroupsLayout({
   return (
     <ModalProvider>
       <ModalOutlet />
-
       {children}
     </ModalProvider>
   );

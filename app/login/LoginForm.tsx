@@ -1,13 +1,13 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useAction } from "next-safe-action/hooks";
-import { loginOtp, loginUser, resendCode } from "@/lib/login";
+import { loginUser } from "@/lib/login";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import SocialLogin from "./SocialLogin";
@@ -89,13 +89,11 @@ export function LoginForm() {
 
   const { execute: handleLoginUser } = useAction(loginUser, {
     onSuccess: async ({ data }) => {
-
       if (data?.success) {
         router.push("/groups");
         return;
       }
 
-      // in case your action returns success:false but doesn't throw
       setFieldErrors({ unauthorised: ["Invalid email or password."] });
     },
     onError({ error }) {
@@ -138,49 +136,6 @@ export function LoginForm() {
     },
     onError({ error }) {
       setError(error.serverError ? String(error.serverError) : "Failed to send code.");
-    },
-  });
-
-  const { execute: handleResend } = useAction(resendCode, {
-    onSuccess: async ({ data }) => {
-      if (!data.challengeId) {
-        setFieldErrors({
-          unauthorised: [
-            "If an account exists for that email, we sent a code.",
-          ],
-        });
-        return;
-      }
-
-      setFieldErrors({});
-      setChallengeId(data.challengeId);
-
-      setStep(2);
-    },
-    onError({ error }) {
-      // Rate limit handling (same pattern you used)
-      if (error.serverError) {
-        const raw = String(error.serverError);
-
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed.code === "RATE_LIMIT") {
-            const ms = Number(parsed.retryAfterMs ?? 30_000);
-            setCooldownUntil(Date.now() + ms);
-            setFieldErrors({ unauthorised: [parsed.message] });
-            return;
-          }
-        } catch {
-          // not JSON, ignore
-        }
-
-        setFieldErrors({ unauthorised: [raw] });
-        return;
-      }
-
-      if (error.validationErrors) {
-        setFieldErrors(error.validationErrors);
-      }
     },
   });
 
@@ -400,27 +355,6 @@ export function LoginForm() {
                 {isVerifying ? "Verifying…" : "Verify & sign in"}
               </button>
 
-              <ResendOtpButton
-                // todo: fix the error on onResend
-                onResend={() => {
-                  if (!challengeId) return;
-                  handleResend({ email, challengeId });
-                }}
-                // isResending={isResending}
-                challengeId={challengeId}
-              />
-              {/* <button
-                type="button"
-                onClick={() => requestOtp()}
-                disabled={isRequesting || isCooldown}
-                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
-              >
-                {isRequesting
-                  ? "Resending…"
-                  : isCooldown
-                  ? `Resend in ${formatSeconds(cooldownMs)}`
-                  : "Resend code"}
-              </button> */}
             </form>
           </div>
         </Card>

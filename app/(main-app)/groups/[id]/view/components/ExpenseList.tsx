@@ -1,19 +1,26 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import ExpenseItem from "./ExpenseItem";
-import { Expenses, GroupExpenseShare, Member } from "@/app/types";
+import { GroupExpenseShare, Member } from "@/app/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useModalStore } from "@/app/stores/ModalProvider";
+import Pagination from "../Pagination";
+
+const PAGE_SIZE = 20;
 
 const ExpenseList = ({
   expenses,
   members,
   groupId,
+  page,
+  totalPages
 }: {
   expenses: GroupExpenseShare[];
   members: Member[];
   groupId: string;
+  page: number,
+  totalPages: number
 }) => {
   const [selectedExpenses, setSelectedExpenses] = useState<Set<string>>(
     new Set()
@@ -41,15 +48,14 @@ const ExpenseList = ({
     }
   };
 
-  const handleExpenseSelect = (expenseId: string, checked: boolean) => {
-    const newSelected = new Set(selectedExpenses);
-    if (checked) {
-      newSelected.add(expenseId);
-    } else {
-      newSelected.delete(expenseId);
-    }
-    setSelectedExpenses(newSelected);
-  };
+  const handleExpenseSelect = useCallback((expenseId: string, checked: boolean) => {
+    setSelectedExpenses(prev => {
+      const next = new Set(prev);
+      if (checked) next.add(expenseId);
+      else next.delete(expenseId);
+      return next;
+    });
+  }, []);
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="rounded-xl bg-gray-50 p-2">
@@ -128,19 +134,18 @@ const ExpenseList = ({
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {expenses.map((expense, i) => (
+                {expenses.map((expense) => (
                   <ExpenseItem
-                    key={i}
+                    key={expense.id}
                     expense={expense}
                     members={members}
                     isSelected={selectedExpenses.has(expense.id)}
-                    onSelect={(checked) =>
-                      handleExpenseSelect(expense.id, checked)
-                    }
+                    onSelect={(checked) => handleExpenseSelect(expense.id, checked)}
                   />
                 ))}
               </tbody>
             </table>
+            <Pagination page={page} totalPages={totalPages} />
           </div>
         </div>
       </div>

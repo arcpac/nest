@@ -27,7 +27,6 @@ import { useRouter } from "next/navigation";
 
 const GroupsView = () => {
   const groups = useDataStore((state) => state.groups);
-  const totalDebt = useDataStore((state) => state.totalDebt);
 
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -44,7 +43,8 @@ const GroupsView = () => {
         router.refresh();
       }
     },
-    onError: () => {
+    onError: ({ error }) => {
+      debugger
       setIsSubmitting(false);
     },
   });

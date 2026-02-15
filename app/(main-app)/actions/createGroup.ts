@@ -12,6 +12,7 @@ const groupSchema = z.object({
 });
 
 export const createGroup = protectedAction
+  .metadata({ actionName: 'addGroup' })
   .inputSchema(groupSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
@@ -24,8 +25,9 @@ export const createGroup = protectedAction
         message: "Group name is required",
       };
     }
+    const userID = (ctx as any).user.id
+    const userEmail = (ctx as any).user.email
 
-    const userEmail = ctx.user.email ?? "";
     if (!userEmail) {
       return {
         isSuccess: false,
@@ -38,12 +40,12 @@ export const createGroup = protectedAction
       .values({
         name: trimmedName,
         active: active ?? true,
-        created_by: ctx.user.id,
+        created_by: userID
       })
       .returning();
 
     await db.insert(members).values({
-      user_id: ctx.user.id,
+      user_id: userID,
       group_id: newGroup.id,
       email: userEmail,
     });

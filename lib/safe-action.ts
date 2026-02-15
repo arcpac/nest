@@ -46,7 +46,7 @@ export const rateLimitMiddleware = async (opts: any) => {
   const actionName: string = metadata?.actionName ?? "unknown";
 
   // Only rate-limit specific protected actions (recommended)
-  const limited = new Set(["createExpense", "addGroupMember"]);
+  const limited = new Set(["createExpense", "addGroupMember", "payExpense", "addGroup"]);
   if (!limited.has(actionName)) {
     return next();
   }

@@ -3,8 +3,9 @@ import { inter } from "../ui/fonts";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 import DataProvider from "../DataProvider";
-import { getUser, getUserProfile } from "@/lib/auth";
-import { getTotalUnpaidShares, getUserGroups } from "./actions/groups";
+import { getUserProfile } from "@/lib/auth";
+import { getSummaryCached, getUserGroupsCached } from "./actions/groups";
+import HeaderBar from "./components/HeaderBar";
 
 
 export default async function MainAppLayout({
@@ -12,13 +13,14 @@ export default async function MainAppLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   const { user, profile } = await getUserProfile();
 
-  const [userGroups] = await Promise.all([
-    getUserGroups(user.id),
-    // getTotalUnpaidShares(user.id),
+  const [userGroups, summary] = await Promise.all([
+    getUserGroupsCached(user.id),
+    getSummaryCached(user.id),
   ]);
+
+  // in this section, parallelise everything needed. groups. debt detail. summary.
   const totalDebt = "12"
   const unpaidCount = 12
   const initialSessionUser = {
@@ -37,6 +39,7 @@ export default async function MainAppLayout({
         >
           <AppSidebar />
           <main className="flex-1 flex flex-col">
+            <HeaderBar />
             <div className="flex-1 p-6">{children}</div>
           </main>
         </DataProvider>

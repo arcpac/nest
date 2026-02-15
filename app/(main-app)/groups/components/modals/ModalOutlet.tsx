@@ -8,6 +8,7 @@ import EditExpenseModal from "./EditExpenseModal";
 import { useDataStore } from "@/app/DataProvider";
 import { useShallow } from "zustand/react/shallow";
 import { useModalStore } from "@/app/stores/ModalProvider";
+import RemoveMemberModal from "./RemoveMemberModal";
 
 const ModalOutlet = () => {
     const { type } = useModalStore(
@@ -21,6 +22,7 @@ const ModalOutlet = () => {
             {type === 'add-expense' && <CreateExpenseModal />}
             {type === 'edit-expense' && <EditExpenseModal />}
             {type === 'delete-expenses' && <DeleteExpensesModal />}
+            {type === 'remove-member' && <RemoveMemberModal />}
         </>
     );
 }

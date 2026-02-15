@@ -1,7 +1,5 @@
 "use client";
-
 import * as React from "react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -13,31 +11,29 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import {
-  Apple,
   AppleIcon,
   BarChart2Icon,
   Bell,
   BookOpen,
-
+  Clapperboard,
+  Cog,
+  Compass,
   FileText,
   Frame,
-  HandCoins,
   History,
   LayoutDashboardIcon,
   LifeBuoy,
+  Link2,
   ListIcon,
+  ListMusic,
   Map,
   PieChart,
-  Receipt,
+  PlaySquare,
   Send,
-  Settings2,
-  Timer,
   Upload,
   UserPlus,
 } from "lucide-react";
 import { UserNav } from "./UserNav";
-import { ItemsWithDropdown } from "./ItemsWithDropdown";
-import { NavWithChildren } from "./NavWithChildren";
 import MainNav from "./MainNav";
 import { useDataStore } from "@/app/DataProvider";
 
@@ -64,18 +60,6 @@ const data = {
       title: "Expenses",
       url: "/expenses",
       icon: ListIcon,
-    },
-
-    // Senior-signal additions
-    {
-      title: "Settle Up",
-      url: "/settlements",
-      icon: HandCoins, // or CreditCard
-    },
-    {
-      title: "Receipts",
-      url: "/receipts",
-      icon: Receipt,
     },
     {
       title: "Activity",
@@ -127,28 +111,6 @@ const data = {
       ],
     },
 
-    {
-      title: "Automation",
-      url: "/automation",
-      icon: Timer, // or Repeat
-      items: [
-        { title: "Recurring Expenses", url: "/automation/recurring" },
-        { title: "Monthly Summaries", url: "/automation/summaries" },
-        { title: "Background Jobs", url: "/automation/jobs" },
-      ],
-    },
-
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-      items: [
-        { title: "Profile", url: "/settings/profile" },
-        { title: "Household & Roles", url: "/settings/household" },
-        { title: "Billing / Plans", url: "/settings/billing" },
-        { title: "Data Export", url: "/settings/export" },
-      ],
-    },
   ],
 
   navSecondary: [
@@ -166,6 +128,15 @@ const data = {
   ],
 };
 
+const primary = [
+  { title: "Dashboard", url: "/dashboard", icon: Compass },
+  { title: "Groups", url: "/groups", icon: Clapperboard },
+  { title: "Expenses", url: "/expenses", icon: ListMusic },
+  { title: "Activity", url: "/activity", icon: PlaySquare },
+  { title: "Shares", url: "/shares", icon: Link2 },
+];
+
+const secondary = [{ title: "Settings", url: "/settings", icon: Cog }];
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { toggleSidebar } = useSidebar();
   const user = useDataStore((s) => s.sessionUser);
@@ -189,11 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <MainNav items={data.mainNav} />
-        <NavWithChildren items={data.navWithChildren} />
-        <ItemsWithDropdown projects={data.projects} />
-        {/* <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        <MainNav primary={primary} secondary={secondary} />
       </SidebarContent>
       <SidebarFooter>
         <UserNav user={data.user} />

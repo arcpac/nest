@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,19 @@ import { registerUser } from "@/lib/registerUser";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
+
+  const redirectTo = searchParams.get("redirect") ?? "/";
+  const prefillEmail = searchParams.get("email");
+
+  const [email, setEmail] = useState(prefillEmail ? prefillEmail : '');
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,6 +37,7 @@ export default function RegisterPage() {
         email,
         password,
         username: username.trim() ? username.trim() : undefined,
+        redirectTo,
       });
 
       if (!res.success) {
@@ -39,13 +45,19 @@ export default function RegisterPage() {
         return;
       }
 
+      // Email confirm ON: no session yet. Tell them to confirm.
+      // After they click the confirmation email, your /auth/callback should
+      // redirect them back to `redirectTo` (e.g. /invites/<token>).
       if (res.needsEmailConfirm) {
-        setInfoMsg("Check your email to confirm your account, then log in.");
-        router.push("/login");
+        setInfoMsg(
+          "Check your email to confirm your account. After confirming, you'll be redirected back to your invite."
+        );
         return;
       }
 
-      router.push("/groups");
+      // Email confirm OFF: session exists immediately.
+      // Go back to the invite (or fallback).
+      router.replace(redirectTo || "/groups");
     } catch (err: any) {
       setErrorMsg(err?.message ?? "Registration failed");
     } finally {
@@ -78,9 +90,7 @@ export default function RegisterPage() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="you@example.com"
-                required
+                disabled={!!prefillEmail}
               />
             </div>
 
@@ -91,7 +101,7 @@ export default function RegisterPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="nickname"
-                placeholder="Anton"
+                placeholder="NestName"
               />
             </div>
 

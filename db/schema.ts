@@ -8,6 +8,8 @@ import {
   serial,
   unique,
   integer,
+  pgEnum,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -130,6 +132,37 @@ export const otpChallenges = pgTable("otpchallenges", {
     .notNull(),
 });
 
+export const inviteStatusEnum = pgEnum("invite_status", [
+  "pending",
+  "accepted",
+  "revoked",
+  "expired"
+])
+
+export const groupInvites = pgTable(
+  "group_invites",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    group_id: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    invited_user_id: uuid("invited_user_id").references(() => users.id), // this is for invited users and existing users
+    invited_by: uuid("invited_by")
+      .notNull()
+      .references(() => users.id),
+    token: text("token").notNull(),
+    status: inviteStatusEnum("status").notNull().default("pending"),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    expires_at: timestamp("expires_at", { withTimezone: true }),
+    accepted_at: timestamp("accepted_at", { withTimezone: true }),
+  },
+  (t) => ({
+    uniqGroupEmail: uniqueIndex("group_invites_group_email_uniq").on(t.group_id, t.email),
+    uniqToken: uniqueIndex("group_invites_token_uniq").on(t.token),
+  })
+);
 
 export const schema = {
   users,

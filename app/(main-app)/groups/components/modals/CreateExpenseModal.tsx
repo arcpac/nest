@@ -5,7 +5,7 @@ import { CSSProperties, FunctionComponent, useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/button";
 import Select, { ClearIndicatorProps, MultiValue } from 'react-select';
-import makeAnimated from 'react-select/animated';
+import { toast } from 'sonner'
 import { CSSObject } from '@emotion/serialize';
 import {
     Dialog,
@@ -79,7 +79,6 @@ export default function CreateExpenseModal() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
     const memberOptions: MemberOption[] = (members ?? []).map((member) => {
-
         const name = member.first_name === null && member.last_name === null ? member.email.trim() : `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim();
         return {
             value: member.id,
@@ -88,23 +87,22 @@ export default function CreateExpenseModal() {
         };
     });
 
-    useEffect(() => {
-        if (!open) return;
-        setTitle("");
-        setAmount("");
-        setDescription("");
-        setIsSubmitting(false);
-    }, [open]);
+
 
     const canSubmit = title.trim().length > 0 && Number(amount) > 0 && !isSubmitting;
 
     const { execute: createExpenseAction } = useAction(createExpense, {
+        onExecute: () => {
+            setIsSubmitting(true);
+            toast.loading("Adding expense...", { id: "add-expense-share" });
+        },
         onSuccess: ({ data }) => {
-            debugger;
             setIsSubmitting(false);
             if (data?.isSuccess) {
+                toast.success(data.message ?? "Expense added", { id: "add-expense-share" })
                 close();
                 router.refresh();
+                return
             }
         },
         onError: () => {
@@ -116,13 +114,9 @@ export default function CreateExpenseModal() {
         if (!groupId || isSubmitting) return;
         const parsedAmount = Number(amount);
         if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) return;
-        debugger
-        setIsSubmitting(true);
-
         const newSelectedMembers = selectedMembers.length
             ? selectedMembers.map((member) => member.value)
             : (members ?? []).map((member) => member.id);
-
         createExpenseAction({
             title: title.trim(),
             amount: parsedAmount,
@@ -132,7 +126,15 @@ export default function CreateExpenseModal() {
             selectedMemberIds: newSelectedMembers
         });
     };
-    console.log('members: ', members)
+
+    useEffect(() => {
+        if (!open) return;
+        setTitle("");
+        setAmount("");
+        setDescription("");
+        setIsSubmitting(false);
+    }, [open]);
+
     return (
         <Dialog open={open} onOpenChange={(v) => !v && close()}>
             <DialogContent className="rounded">
@@ -198,7 +200,7 @@ export default function CreateExpenseModal() {
                     <Button variant="outline" onClick={close} type="button">
                         Cancel
                     </Button>
-                    <Button onClick={handleCreateExpense} disabled={!canSubmit} type="button">
+                    <Button onClick={handleCreateExpense} disabled={!canSubmit || isSubmitting} type="button">
                         {isSubmitting ? "Creating..." : "Create Expense"}
                     </Button>
                 </DialogFooter>

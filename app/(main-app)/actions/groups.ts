@@ -1,8 +1,15 @@
 import { expense_shares, expenses, groups, members, users } from "@/db/schema";
 import { db } from "@/db";
-import { and, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
-export async function getTotalUnpaidShares(userId: string) {
+export const getSummaryCached = (userId: string) =>
+  unstable_cache(
+    () => getTotalUnpaidShares(userId),
+    ["summary", userId],
+    { tags: [`user:${userId}:summary`], revalidate: 15 }
+  )();
+async function getTotalUnpaidShares(userId: string) {
   const [row] = await db
     .select({
       totalDebt: sql<string>`
@@ -41,7 +48,14 @@ export async function getGroupMembers(groupId: string) {
   return groupMembers
 }
 
-export async function getUserGroups(userId: string) {
+
+export const getUserGroupsCached = (userId: string) =>
+  unstable_cache(
+    () => getUserGroups(userId),
+    ["userGroups", userId],
+    { tags: [`user:${userId}:groups`], revalidate: 60 }
+  )();
+async function getUserGroups(userId: string) {
   const userGroups = await db.select({
     id: groups.id,
     name: groups.name,
@@ -56,8 +70,13 @@ export async function getUserGroups(userId: string) {
   return userGroups
 }
 
-
-export async function getGroupWithMembers(groupId: string) {
+export const getGroupWithMembersCached = (groupId: string) =>
+  unstable_cache(
+    () => getGroupWithMembers(groupId),
+    ["groupWithMembers", groupId],
+    { tags: [`group:${groupId}:members`], revalidate: 60 }
+  )();
+async function getGroupWithMembers(groupId: string) {
   const group = await db
     .select({
       id: groups.id,
@@ -90,10 +109,17 @@ export async function getGroupWithMembers(groupId: string) {
   return { group, members: membersList };
 }
 
-export async function getGroupExpenses(groupId: string, userId: string) {
+export async function getGroupExpenses(
+  groupId: string,
+  userId: string,
+  opts: { page: number; pageSize: number }
+) {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const page = Math.max(1, Number(opts.page || 1));
+    const pageSize = Math.min(100, Math.max(1, Number(opts.pageSize || 20)));
+    const offset = (page - 1) * pageSize;
 
+    // Get this user's memberId for the group
     const member = await db
       .select({ memberId: members.id })
       .from(members)
@@ -102,41 +128,54 @@ export async function getGroupExpenses(groupId: string, userId: string) {
       .then((res) => res[0]);
 
     if (!member) {
-      return { expenses: [], totalGroupDebt: "0.00" };
+      return { expenses: [], totalCount: 0 };
     }
 
-    const groupExpenses = await db
-      .select({
-        id: expenses.id,
-        title: expenses.title,
-        amount: expenses.amount,
-        description: expenses.description,
-        isEqual: expenses.isEqual,
-        created_by: expenses.created_by,
-        createdAt: expenses.created_at,
-        share: expense_shares.share,
-        isPaid: expense_shares.paid,
-      })
-      .from(expenses)
-      .leftJoin(
-        expense_shares,
-        and(
-          eq(expense_shares.expense_id, expenses.id),
-          eq(expense_shares.member_id, member.memberId)
-        )
-      )
-      .where(
-        and(
-          eq(expenses.group_id, groupId),
-          or(
-            eq(expenses.created_by, userId),
-            and(isNotNull(expense_shares.member_id), eq(expense_shares.paid, false))
-          )
-        )
-      )
+    // Base filter: expenses in group where THIS member has an unpaid share
+    const whereUnpaidForMember = and(
+      eq(expenses.group_id, groupId),
+      eq(expense_shares.member_id, member.memberId),
+      eq(expense_shares.paid, false)
+    );
 
+    // Page query + count query in parallel
+    const [groupExpenses, countRow] = await Promise.all([
+      db
+        .select({
+          id: expenses.id,
+          title: expenses.title,
+          amount: expenses.amount,
+          description: expenses.description,
+          isEqual: expenses.isEqual,
+          created_by: expenses.created_by,
+          createdAt: expenses.created_at,
+          share: expense_shares.share,
+          isPaid: expense_shares.paid,
+        })
+        .from(expenses)
+        // innerJoin because we require a share row for this member anyway
+        .innerJoin(expense_shares, eq(expense_shares.expense_id, expenses.id))
+        .where(whereUnpaidForMember)
+        // deterministic ordering for stable pagination
+        .orderBy(desc(expenses.created_at), desc(expenses.id))
+        .limit(pageSize)
+        .offset(offset),
 
-    const expenseIds = groupExpenses.map((expense) => expense.id);
+      db
+        .select({
+          total: sql<number>`COUNT(DISTINCT ${expenses.id})`.as("total"),
+        })
+        .from(expenses)
+        .innerJoin(expense_shares, eq(expense_shares.expense_id, expenses.id))
+        .where(whereUnpaidForMember)
+        .then((r) => r[0]),
+    ]);
+
+    const totalCount = Number(countRow?.total ?? 0);
+
+    // Only fetch memberIds for the current page of expenses
+    const expenseIds = groupExpenses.map((e) => e.id);
+
     const expenseMemberIds = expenseIds.length
       ? await db
         .select({
@@ -154,30 +193,31 @@ export async function getGroupExpenses(groupId: string, userId: string) {
       return acc;
     }, new Map<string, string[]>());
 
-    const expensesClean = groupExpenses.map((expense) => {
-      return {
-        id: expense.id,
-        title: expense.title,
-        amount: expense.amount,
-        description: expense.description,
-        isEqual: expense.isEqual,
-        created_by: expense.created_by,
-        createdAt: expense.createdAt,
-        shareAmount: expense.share,
-        isPaid: expense.isPaid ?? false,
-        memberIds: memberIdsByExpense.get(expense.id) ?? [],
-      };
-    });
+    const expensesClean = groupExpenses.map((expense) => ({
+      id: expense.id,
+      title: expense.title,
+      amount: expense.amount,
+      description: expense.description,
+      isEqual: expense.isEqual,
+      created_by: expense.created_by,
+      createdAt: expense.createdAt,
+      shareAmount: expense.share,
+      isPaid: expense.isPaid ?? false,
+      memberIds: memberIdsByExpense.get(expense.id) ?? [],
+    }));
 
     return {
       expenses: expensesClean,
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(totalCount / pageSize)),
     };
   } catch (error) {
     console.error("Error fetching group expenses:", error);
-    return { expenses: [], totalGroupDebt: "0.00" };
+    return { expenses: [], totalCount: 0, page: 1, pageSize: opts.pageSize, totalPages: 1 };
   }
 }
-
 
 
 

@@ -13,12 +13,14 @@ const payExpenseSchema = z.object({
 });
 
 
-export const payExpenseTest = protectedAction
+export const payExpense = protectedAction
+    .metadata({ actionName: "createExpense" })
+
     .inputSchema(payExpenseSchema, {
         handleValidationErrorsShape: async (ve) =>
             flattenValidationErrors(ve).fieldErrors,
     })
     .action(async ({ parsedInput: { expenseIds }, ctx }) => {
-        const userId = ctx.user.id;
+        const userId = (ctx as any).user.id
         return payExpenseTestCore(userId, expenseIds);
     });

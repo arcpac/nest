@@ -1,30 +1,46 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
-// Create a transporter using Ethereal test credentials.
-// For production, replace with your actual SMTP server details.
-var transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
+const SMTP_HOST = process.env.SMTP_HOST!;
+const SMTP_PORT = Number(process.env.SMTP_PORT || "465");
+const SMTP_SECURE = process.env.SMTP_SECURE === "false"; // true for 465 usually
+const SMTP_USER = process.env.SMTP_USER!;
+const SMTP_PASS = process.env.SMTP_PASS!;
+const SMTP_FROM = process.env.SMTP_FROM || "SplitNest <no-reply@domain.com>";
+
+export const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST!,
+  port: Number(process.env.SMTP_PORT || "2525"),
+  secure: process.env.SMTP_SECURE === "true", // should be false for 2525/587
   auth: {
-    user: "378fbec8376663",
-    pass: "f10bc2adcc68b3",
+    user: process.env.SMTP_USER!,
+    pass: process.env.SMTP_PASS!,
   },
+
+  // Optional: forces STARTTLS upgrade (helpful for some setups)
+  requireTLS: true,
 });
 
-export async function sendOtp(opts: { to: string; code: string }) {
-  const { to, code } = opts;
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM!,
+export async function sendInviteEmail(opts: {
+  to: string;
+  inviteLink: string;
+  inviterEmail?: string;
+}) {
+  console.log('SMTP_HOST: ', SMTP_HOST)
+  console.log('SMTP_PORT: ', SMTP_PORT)
+  console.log('SECURE : ', SMTP_SECURE)
+  console.log('SMTP_PASS : ', SMTP_PASS)
+  console.log('SMTP_FROM', SMTP_FROM)
+  const { to, inviteLink, inviterEmail } = opts;
+
+  return transporter.sendMail({
+    from: SMTP_FROM,
     to,
-    subject: "Your login code",
-    text: `Your SplitNest login code is: ${code}\n\nThis code expires in 10 minutes.`,
+    subject: "You're invited to SplitNest",
+    text: `You've been invited to SplitNest.\n\nAccept invite: ${inviteLink}\n\nInvited by: ${inviterEmail ?? "SplitNest"}`,
     html: `
-      <div style="font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height:1.4">
-        <h2>Your login code</h2>
-        <p>Use this code to sign in:</p>
-        <p style="font-size:28px; letter-spacing:6px; font-weight:700">${code}</p>
-        <p>This code expires in 10 minutes.</p>
-      </div>
+      <p>You’ve been invited to <b>SplitNest</b>.</p>
+      <p><a href="${inviteLink}">Accept invite</a></p>
+      <p style="color:#666;font-size:12px;">Invited by: ${inviterEmail ?? "SplitNest"}</p>
     `,
   });
 }

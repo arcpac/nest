@@ -11,7 +11,7 @@ const GroupRow = memo(({ group }: { group: Group }) => {
   return (
     <tr key={group.id} className="border-b text-sm">
       <td className="whitespace-nowrap py-3 pl-6 pr-3">
-        <Link href={`/groups/${group.id}/view`}>
+        <Link href={`/groups/${group.id}/view`} prefetch={false}>
           <span className="hover:text-blue-500 hover:underline">
             {group.name}
           </span>
