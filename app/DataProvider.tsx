@@ -7,7 +7,7 @@ import { Group } from "./types";
 type SessionUser = {
   id: string;
   name: string | null;
-  email: string | null;
+  email?: string;
 };
 
 

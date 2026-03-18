@@ -1,17 +1,17 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useAction } from "next-safe-action/hooks";
-import { loginOtp, loginUser, resendCode } from "@/lib/login";
+import { loginUser } from "@/lib/login";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import SocialLogin from "./SocialLogin";
-import { ResendOtpButton } from "./components/ResendCodeButton";
+import { sendMagicLink } from "../(main-app)/actions/sendMagicLink";
 
 type FormErrors =
   | {
@@ -87,21 +87,13 @@ export function LoginForm() {
   }, [cooldownUntil]);
 
   const { execute: handleLoginUser } = useAction(loginUser, {
-    onSuccess: async ({ }) => {
-      const normalizedEmail =
-        submittedEmailRef.current ?? normalizeLoginEmail(email);
-      const res = await signIn("credentials", {
-        email: normalizedEmail,
-        password,
-        redirect: false,
-      });
-      if (res?.ok) {
+    onSuccess: async ({ data }) => {
+      if (data?.success) {
         router.push("/groups");
-      } else {
-        setFieldErrors({
-          unauthorised: ["Incorrect email and password."],
-        });
+        return;
       }
+
+      setFieldErrors({ unauthorised: ["Invalid email or password."] });
     },
     onError({ error }) {
       if (error.serverError) {
@@ -111,7 +103,6 @@ export function LoginForm() {
           const parsed = JSON.parse(raw);
           if (parsed.code === "RATE_LIMIT") {
             const ms = Number(parsed.retryAfterMs ?? 30_000);
-
             setCooldownUntil(Date.now() + ms);
             setFieldErrors({ unauthorised: [parsed.message] });
             return;
@@ -124,93 +115,23 @@ export function LoginForm() {
         return;
       }
 
-      if (error.validationErrors) setFieldErrors(error.validationErrors);
+      console.log('Error: ', error)
     },
   });
 
-  const { execute: handleLoginOtp } = useAction(loginOtp, {
-    onSuccess: async ({ data }) => {
-      if (!data.challengeId) {
-        setFieldErrors({
-          unauthorised: [
-            "If an account exists for that email, we sent a code.",
-          ],
-        });
+  const { execute: handleEmailSubmit } = useAction(sendMagicLink, {
+    onSuccess: ({ data }) => {
+      if (!data) {
+        setError(data ?? "Failed to send code.");
         return;
       }
 
-      setFieldErrors({});
-      setChallengeId(data.challengeId);
-
+      setError(null);
       setStep(2);
+      setCooldownUntil(Date.now() + 30_000);
     },
     onError({ error }) {
-      // Rate limit handling (same pattern you used)
-      if (error.serverError) {
-        const raw = String(error.serverError);
-
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed.code === "RATE_LIMIT") {
-            const ms = Number(parsed.retryAfterMs ?? 30_000);
-            setCooldownUntil(Date.now() + ms);
-            setFieldErrors({ unauthorised: [parsed.message] });
-            return;
-          }
-        } catch {
-          // not JSON, ignore
-        }
-
-        setFieldErrors({ unauthorised: [raw] });
-        return;
-      }
-
-      if (error.validationErrors) {
-        setFieldErrors(error.validationErrors);
-      }
-    },
-  });
-
-  const { execute: handleResend } = useAction(resendCode, {
-    onSuccess: async ({ data }) => {
-      if (!data.challengeId) {
-        setFieldErrors({
-          unauthorised: [
-            "If an account exists for that email, we sent a code.",
-          ],
-        });
-        return;
-      }
-
-      setFieldErrors({});
-      setChallengeId(data.challengeId);
-
-      setStep(2);
-    },
-    onError({ error }) {
-      // Rate limit handling (same pattern you used)
-      if (error.serverError) {
-        const raw = String(error.serverError);
-
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed.code === "RATE_LIMIT") {
-            const ms = Number(parsed.retryAfterMs ?? 30_000);
-            setCooldownUntil(Date.now() + ms);
-            setFieldErrors({ unauthorised: [parsed.message] });
-            return;
-          }
-        } catch {
-          // not JSON, ignore
-        }
-
-        setFieldErrors({ unauthorised: [raw] });
-        return;
-      }
-
-      if (error.validationErrors) {
-        setFieldErrors(error.validationErrors);
-      }
+      setError(error.serverError ? String(error.serverError) : "Failed to send code.");
     },
   });
 
@@ -369,7 +290,7 @@ export function LoginForm() {
                 {
                   loginWithPassword
                     ? handleLoginUser({ email: normalizedEmail, password })
-                    : handleLoginOtp({ email: normalizedEmail });
+                    : handleEmailSubmit({ email: normalizedEmail });
                 }
               }}
             >
@@ -386,74 +307,29 @@ export function LoginForm() {
         <Card className="overflow-hidden p-0">
           <div className="flex flex-col gap-2 p-10 justify-center">
             <div className="flex flex-col items-center text-center">
-              <h1 className="text-2xl font-bold">Welcome back</h1>
+              <h1 className="text-2xl font-bold">Check your email</h1>
               <p className="text-muted-foreground text-balance">
-                Login to your Nest account
+                We&apos;ve sent a magic link to{" "}
+                <span className="font-medium text-neutral-900 dark:text-white">
+                  {maskEmail(email)}
+                </span>
+                . Click it to sign in.
               </p>
             </div>
-            <form onSubmit={onCodeSubmit} className="mt-6 space-y-4">
-              <div className="rounded-xl py-3 text-sm text-neutral-700 ">
-                Code sent to
-                <span className="font-medium">{maskEmail(email)}</span>
-                <button
-                  type="button"
-                  onClick={goBackToEmail}
-                  className="ml-2 text-xs font-semibold text-neutral-900 underline underline-offset-2 dark:text-white"
-                >
-                  Change
-                </button>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-                  6-digit code
-                </label>
-                <input
-                  value={code}
-                  onChange={(e) => {
-                    // keep digits only, max 6
-                    const v = e.target.value.replace(/\D/g, "").slice(0, 6);
-                    setCode(v);
-                  }}
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  placeholder="123456"
-                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-center text-lg tracking-[0.35em] outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
-                />
-              </div>
-
+            <div className="mt-6 rounded-xl py-3 text-sm text-neutral-700 text-center">
+              Didn&apos;t get it?
               <button
-                type="submit"
-                disabled={!canVerify || isVerifying}
-                className="w-full rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900"
-              >
-                {isVerifying ? "Verifying…" : "Verify & sign in"}
-              </button>
-
-              <ResendOtpButton
-                // todo: fix the error on onResend
-                onResend={() => {
-                  if (!challengeId) return;
-                  handleResend({ email, challengeId });
-                }}
-                // isResending={isResending}
-                challengeId={challengeId}
-              />
-              {/* <button
                 type="button"
-                onClick={() => requestOtp()}
-                disabled={isRequesting || isCooldown}
-                className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
+                onClick={goBackToEmail}
+                className="ml-2 text-xs font-semibold text-neutral-900 underline underline-offset-2 dark:text-white"
               >
-                {isRequesting
-                  ? "Resending…"
-                  : isCooldown
-                  ? `Resend in ${formatSeconds(cooldownMs)}`
-                  : "Resend code"}
-              </button> */}
-            </form>
+                Change email
+              </button>
+            </div>
           </div>
         </Card>
+
       )}
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}

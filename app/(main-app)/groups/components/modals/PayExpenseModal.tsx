@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { PayExpensePayload, useModalStore } from "@/app/stores/ModalProvider";
 import { useAction } from "next-safe-action/hooks";
-import { payExpense } from "@/app/(main-app)/actions/payExpense";
 import { useRouter } from "next/navigation";
+import { payExpense } from "@/app/(main-app)/actions/payExpenseTest";
+import { toast } from "sonner";
 
 const PayExpenseModal = () => {
     const router = useRouter();
@@ -51,9 +52,14 @@ const PayExpenseModal = () => {
     }, [open, selectedExpenseIds.length]);
 
     const { execute: payExpenseAction } = useAction(payExpense, {
+        onExecute: () => {
+            setIsSubmitting(true);
+            toast.loading("Processing...", { id: "settle-expense" });
+        },
         onSuccess: ({ data }) => {
             setIsSubmitting(false);
             if (data?.isSuccess) {
+                toast.success(data.message ?? "Expense settled", { id: "settle-expense" })
                 close();
                 router.refresh();
                 return;
@@ -108,7 +114,7 @@ const PayExpenseModal = () => {
                     <Button variant="outline" onClick={close} type="button" disabled={isSubmitting}>
                         Cancel
                     </Button>
-                    <Button onClick={handlePayExpenses} disabled={!canSubmit} type="button">
+                    <Button onClick={handlePayExpenses} disabled={!canSubmit || isSubmitting} type="button">
                         {isSubmitting ? "Processing..." : "Confirm Payment"}
                     </Button>
                 </DialogFooter>

@@ -1,15 +1,12 @@
 "use server";
 
 import { z } from "zod";
-import { actionClient, protectedAction } from "@/lib/safe-action";
+import { protectedAction } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 import { expenses, expense_shares, members } from "@/db/schema";
 import { db } from "@/db";
-import { getServerSession } from "next-auth";
 
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 
 const expenseSchema = z.object({
   title: z.string().min(1).max(50),
@@ -20,7 +17,9 @@ const expenseSchema = z.object({
   customShares: z.record(z.string(), z.string()).optional(),
   selectedMemberIds: z.array(z.string()).optional(),
 });
+
 export const createExpense = protectedAction
+  .metadata({ actionName: "createExpense" })
   .inputSchema(expenseSchema, {
     handleValidationErrorsShape: async (ve) =>
       flattenValidationErrors(ve).fieldErrors,
@@ -38,8 +37,9 @@ export const createExpense = protectedAction
       },
       ctx,
     }) => {
-      const userID = ctx.session.user.id;
-      console.log('CREATEEXPENSE')
+      const userID = (ctx as any)?.user?.id;
+      if (!userID) throw new Error("Unauthorized");
+
       if (amount <= 0) {
         return {
           isSuccess: false,
@@ -73,14 +73,13 @@ export const createExpense = protectedAction
           isEqual,
         })
         .returning();
-      console.log('new expense created: ', newExpense)
 
       if (isEqual) {
         const memberSet = new Set(selectedMemberIds && selectedMemberIds.length > 0 ? selectedMemberIds : groupMembers.map((m) => m.id));
 
-        console.log('memberSet: ', memberSet)
+
         const targetMembers = groupMembers.filter((m) => memberSet.has(m.id));
-        console.log('targetMembers: ', targetMembers)
+
         if (targetMembers.length === 0) {
           return {
             isSuccess: false,
@@ -88,7 +87,7 @@ export const createExpense = protectedAction
           };
         }
         const shareAmount = amount / targetMembers.length;
-        console.log('shareamount: ', shareAmount)
+
         const shareEntries = targetMembers.map((member) => ({
           expense_id: newExpense.id,
           member_id: member.id,
@@ -96,10 +95,7 @@ export const createExpense = protectedAction
           paid: false,
         }));
 
-        console.log('shareEntries: ', shareEntries)
-
-        const newlyCreatedExpenseShare = await db.insert(expense_shares).values(shareEntries).returning();;
-        console.log('newlyCreatedExpenseShare', newlyCreatedExpenseShare)
+        await db.insert(expense_shares).values(shareEntries).returning();
       } else {
         if (!selectedMemberIds || selectedMemberIds.length === 0) {
           return {

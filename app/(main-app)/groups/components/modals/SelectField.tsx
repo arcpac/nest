@@ -59,7 +59,7 @@ const SelectField = ({
     const memberOptions: MemberOption[] = useMemo(
         () =>
             (members ?? []).map((member) => {
-                const name = `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim();
+                const name = member.first_name === null && member.last_name === null ? member.email.trim() : `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim();
                 return {
                     value: member.id,
                     label: name,

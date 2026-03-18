@@ -24,9 +24,7 @@ export function TableSkeleton() {
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <div className="flex flex-row justify-between">
-        <h2 className={`mb-4 text-xl md:text-2xl`}>Expenses</h2>
         <div className="flex text-sm text-blue-500 m-4 rounded-full border gap-3">
-          <div className="cursor-pointer">Pay all</div>
           <div>
             <Skeleton className="h-4" />
           </div>
@@ -113,15 +111,11 @@ export function TableSkeleton() {
 export function ExpensesSkeleton() {
   return (
     <div
-      className={`${shimmer} relative flex w-full flex-col overflow-hidden md:col-span-4`}
+      className={`${shimmer} relative flex w-full flex-col overflow-hidden md:col-span-12`}
     >
       <div className="mb-4 h-8 w-36 rounded-md bg-gray-100" />
       <div className="flex grow flex-col justify-between rounded-xl bg-gray-100 p-4">
         <div className="bg-white px-6">
-          <TableSkeleton />
-          <TableSkeleton />
-          <TableSkeleton />
-          <TableSkeleton />
           <TableSkeleton />
         </div>
         <div className="flex items-center pb-2 pt-6">

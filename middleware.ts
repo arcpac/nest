@@ -1,27 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-const protectedRoutes = ["/groups", "/expenses"];
-const publicRoutes = ["/login"];
-//next-auth
-export default async function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => path === route || path.startsWith(`${route}/`)
+export async function middleware(req: NextRequest) {
+  let response = NextResponse.next();
+
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return req.cookies.get(name)?.value;
+        },
+        set(name, value, options) {
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          response.cookies.set({ name, value: "", ...options });
+        },
+      },
+    }
   );
-  const isPublicRoute = publicRoutes.some(
-    (route) => path === route || path.startsWith(`${route}/`)
-  );
-  const isCreateExpenseRoute = /^\/groups\/[^/]+\/create-expense$/.test(path);
 
-  // Get the JWT token from next-auth
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  // Refresh session if needed
+  await supabase.auth.getUser();
 
-  if (isProtectedRoute && !token?.id && !isCreateExpenseRoute)
-    return NextResponse.redirect(new URL("/login", req.url));
-
-  if (isPublicRoute && token?.id)
-    return NextResponse.redirect(new URL("/groups", req.url));
-
-  return NextResponse.next();
+  return response;
 }
+
+export const config = {
+  matcher: ["/((?!_next|favicon.ico).*)"],
+};

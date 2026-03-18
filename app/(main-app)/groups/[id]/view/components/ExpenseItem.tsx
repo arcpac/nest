@@ -26,9 +26,7 @@ const ExpenseItem = ({
     () => members.find((mm) => mm.user_id === expense.created_by),
     [members]
   );
-  // Payment dialog state
-  const [paymentType, setPaymentType] = useState<"full" | "partial">("full");
-  const [partialAmount, setPartialAmount] = useState<string>("0.00");
+
   const openModal = useModalStore((modalStore) => modalStore.open)
 
   return (

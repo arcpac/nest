@@ -5,7 +5,13 @@ import { createStore, StoreApi } from "zustand";
 import { useStoreWithEqualityFn } from "zustand/traditional";
 import { Member } from "../types";
 
-type ModalType = "pay-expense" | "add-expense" | "edit-expense" | "delete-expenses" | null;
+type ModalType =
+    "pay-expense"
+    | "add-expense"
+    | "edit-expense"
+    | "delete-expenses"
+    | "remove-member"
+    | null;
 
 export type PayExpensePayload = {
     selectedExpenses?: Set<string> | string[];
@@ -19,6 +25,12 @@ export type PayExpensePayload = {
 export type AddExpensePayload = {
     members: Member[]
 }
+
+export type RemoveMemberPayload = {
+    groupId: string;
+    userId: string
+}
+
 export type EditExpensePayload = {
     expense: {
         expenseId: string;
@@ -38,6 +50,7 @@ type ModalPayload =
     | PayExpensePayload
     | AddExpensePayload
     | EditExpensePayload
+    | RemoveMemberPayload
     | DeleteExpensesPayload;
 
 type ModalStore = {

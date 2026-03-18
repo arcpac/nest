@@ -48,15 +48,11 @@ export async function POST(req: Request) {
     const challengeId = String(body?.challengeId ?? "");
     const code = String(body?.code ?? "").trim();
 
-    console.log('email: ', email)
-    console.log('code: ', code)
-    console.log('challengeId: ', challengeId)
-
     if (!email || !email.includes("@")) {
       return NextResponse.json({ ok: false, error: "Invalid email" }, { status: 400 });
     }
     if (!challengeId || !/^\d{6}$/.test(code)) {
-      console.log('invalid code 1')
+
       return NextResponse.json({ ok: false, error: "Invalid code" }, { status: 400 });
     }
 

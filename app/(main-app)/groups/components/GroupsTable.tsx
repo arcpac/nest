@@ -58,8 +58,8 @@ function GroupsTable({ groups }: { groups: Group[] }) {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {stableGroups?.map((group, i) => (
-                <GroupRow key={i} group={group} />
+              {stableGroups?.map((group) => (
+                <GroupRow key={group.id} group={group} />
               ))}
             </tbody>
           </table>
