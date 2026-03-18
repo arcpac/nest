@@ -36,36 +36,35 @@ export const authMiddleware = async ({ next }: any) => {
   return next({ ctx: { user } });
 };
 
-export const rateLimitMiddleware = async (opts: any) => {
-  const { next, ctx, metadata } = opts;
+// export const rateLimitMiddleware = async (opts: any) => {
+//   const { next, ctx, metadata } = opts;
 
-  // ctx is typed as `object` by the library — so narrow it here
-  const userId: string | undefined = ctx?.user?.id;
-  if (!userId) throw new Error("Unauthorized");
+//   // ctx is typed as `object` by the library — so narrow it here
+//   const userId: string | undefined = ctx?.user?.id;
+//   if (!userId) throw new Error("Unauthorized");
 
-  const actionName: string = metadata?.actionName ?? "unknown";
+//   const actionName: string = metadata?.actionName ?? "unknown";
 
-  // Only rate-limit specific protected actions (recommended)
-  const limited = new Set(["createExpense", "addGroupMember", "payExpense", "addGroup"]);
-  if (!limited.has(actionName)) {
-    return next();
-  }
-  const ip = await getClientIp();
+//   // Only rate-limit specific protected actions (recommended)
+//   const limited = new Set(["createExpense", "addGroupMember", "payExpense", "addGroup"]);
+//   if (!limited.has(actionName)) {
+//     return next();
+//   }
+//   const ip = await getClientIp();
 
-  const key = `u:${userId}:${actionName}`;
-  console.log("[RL]", { actionName, userId, key });
-  const result = await protectedRatelimit.limit(key);
-  console.log("[RL RESULT]", { success: result.success, remaining: result.remaining, reset: result.reset });
+//   const key = `u:${userId}:${actionName}`;
+//   console.log("[RL]", { actionName, userId, key });
+//   const result = await protectedRatelimit.limit(key);
+//   console.log("[RL RESULT]", { success: result.success, remaining: result.remaining, reset: result.reset });
 
 
-  if (!result.success) {
-    console.log('ASDFASFAFADF')
-    const retryAfterMs = result.reset ? result.reset - Date.now() : undefined;
-    throw new RateLimitError("Rate limited", retryAfterMs);
-  }
+//   if (!result.success) {
+//     const retryAfterMs = result.reset ? result.reset - Date.now() : undefined;
+//     throw new RateLimitError("Rate limited", retryAfterMs);
+//   }
 
-  return next();
-};
+//   return next();
+// };
 
 export const protectedAction = createSafeActionClient({
   defineMetadataSchema() {
@@ -87,4 +86,4 @@ export const protectedAction = createSafeActionClient({
   },
 })
   .use(authMiddleware)
-  .use(rateLimitMiddleware);
+// .use(rateLimitMiddleware);

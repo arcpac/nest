@@ -11,8 +11,7 @@ import { loginUser } from "@/lib/login";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import SocialLogin from "./SocialLogin";
-import { ResendOtpButton } from "./components/ResendCodeButton";
-import { requestOtp } from "../(main-app)/actions/requestOtp";
+import { sendMagicLink } from "../(main-app)/actions/sendMagicLink";
 
 type FormErrors =
   | {
@@ -120,18 +119,15 @@ export function LoginForm() {
     },
   });
 
-  const { execute: handleEmailSubmit } = useAction(requestOtp, {
+  const { execute: handleEmailSubmit } = useAction(sendMagicLink, {
     onSuccess: ({ data }) => {
-      if (!data?.success) {
-        setError(data?.message ?? "Failed to send code.");
+      if (!data) {
+        setError(data ?? "Failed to send code.");
         return;
       }
 
       setError(null);
-      // move to next step
       setStep(2);
-
-      // optional: start cooldown UI
       setCooldownUntil(Date.now() + 30_000);
     },
     onError({ error }) {
@@ -311,53 +307,29 @@ export function LoginForm() {
         <Card className="overflow-hidden p-0">
           <div className="flex flex-col gap-2 p-10 justify-center">
             <div className="flex flex-col items-center text-center">
-              <h1 className="text-2xl font-bold">Welcome back</h1>
+              <h1 className="text-2xl font-bold">Check your email</h1>
               <p className="text-muted-foreground text-balance">
-                Login to your Nest account
+                We&apos;ve sent a magic link to{" "}
+                <span className="font-medium text-neutral-900 dark:text-white">
+                  {maskEmail(email)}
+                </span>
+                . Click it to sign in.
               </p>
             </div>
-            <form onSubmit={onCodeSubmit} className="mt-6 space-y-4">
-              <div className="rounded-xl py-3 text-sm text-neutral-700 ">
-                Code sent to
-                <span className="font-medium">{maskEmail(email)}</span>
-                <button
-                  type="button"
-                  onClick={goBackToEmail}
-                  className="ml-2 text-xs font-semibold text-neutral-900 underline underline-offset-2 dark:text-white"
-                >
-                  Change
-                </button>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-                  6-digit code
-                </label>
-                <input
-                  value={code}
-                  onChange={(e) => {
-                    // keep digits only, max 6
-                    const v = e.target.value.replace(/\D/g, "").slice(0, 6);
-                    setCode(v);
-                  }}
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  placeholder="123456"
-                  className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-center text-lg tracking-[0.35em] outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
-                />
-              </div>
-
+            <div className="mt-6 rounded-xl py-3 text-sm text-neutral-700 text-center">
+              Didn&apos;t get it?
               <button
-                type="submit"
-                disabled={!canVerify || isVerifying}
-                className="w-full rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+                type="button"
+                onClick={goBackToEmail}
+                className="ml-2 text-xs font-semibold text-neutral-900 underline underline-offset-2 dark:text-white"
               >
-                {isVerifying ? "Verifying…" : "Verify & sign in"}
+                Change email
               </button>
-
-            </form>
+            </div>
           </div>
         </Card>
+
       )}
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}

@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
     const url = new URL(request.url);
-
+    console.log('URL => ', url)
     // Supabase redirects back with ?code=...
     const code = url.searchParams.get("code");
 

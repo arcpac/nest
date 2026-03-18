@@ -9,8 +9,8 @@ const requestOtpSchema = z.object({
     email: z.email(),
 });
 
-export const requestOtp = publicAction
-    .metadata({ actionName: "requestOtp" })
+export const sendMagicLink = publicAction
+    .metadata({ actionName: "requestMagicLink" })
     .inputSchema(requestOtpSchema, {
         handleValidationErrorsShape: async (ve) =>
             flattenValidationErrors(ve).fieldErrors,
@@ -28,6 +28,5 @@ export const requestOtp = publicAction
         if (error) {
             return { success: false as const, message: error.message };
         }
-
         return { success: true as const };
     });

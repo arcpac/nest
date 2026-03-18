@@ -11,13 +11,16 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import {
+  Activity,
   AppleIcon,
+  Banknote,
   BarChart2Icon,
   Bell,
   BookOpen,
   Clapperboard,
   Cog,
   Compass,
+  Component,
   FileText,
   Frame,
   History,
@@ -41,7 +44,7 @@ const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   },
 
   // Top-level quick nav (core screens)
@@ -54,17 +57,17 @@ const data = {
     {
       title: "Groups",
       url: "/groups",
-      icon: ListIcon,
+      icon: Component,
     },
     {
       title: "Expenses",
       url: "/expenses",
-      icon: ListIcon,
+      icon: Banknote,
     },
     {
       title: "Activity",
       url: "/activity",
-      icon: History, // audit trail / event log vibe
+      icon: Activity,
     },
 
     // Nice-to-have
@@ -75,7 +78,6 @@ const data = {
     },
   ],
 
-  // Grouped sections (feature areas / settings)
   navWithChildren: [
     {
       title: "Imports",
